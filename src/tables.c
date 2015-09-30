@@ -93,7 +93,7 @@ int64_t get_addr_for_symbol(SymbolTable* table, const char* name) {
         // Looking for the name
 	// I think have to loop through the entire array to check if name.
         int i = 0;
-	int array_size = sizeof(*table) / sizeof((*table)[0]);
+	int array_size = sizeof(table->tbl) / sizeof((table->tbl)[0]);
 	// Hopefully will give me size of the array. 
         while (i < array_size) {
    	    if (!strcmp(name, table->tbl[i].name)) {
