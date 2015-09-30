@@ -98,7 +98,7 @@ int64_t get_addr_for_symbol(SymbolTable* table, const char* name) {
         while (i < array_size) {
    	    if (!strcmp(name, table->tbl[i].name)) {
 	        // Yes we've found the one. 
-	        return table->table[i].addr;
+	        return table->tbl[i].addr;
  	    }
 	    i++; 
 	}
