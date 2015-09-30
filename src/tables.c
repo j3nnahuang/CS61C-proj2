@@ -45,7 +45,34 @@ void write_symbol(FILE* output, uint32_t addr, const char* name) {
  */
 SymbolTable* create_table(int mode) {
     /* YOUR CODE HERE */
-    return NULL;
+    // So SymbolTable's tbl field = an ARRAY of Symbols. 
+
+    // Thank goodness for lab02. 
+    SymbolTable* table_pointer;
+
+    /* First allocate memory for the struct. */
+    table_pointer = malloc(sizeof(SymbolTable));
+
+    /* Check return value - make sure got memory. */
+    if (table_pointer == NULL) {
+      allocation_failed();
+    }
+
+    /* Initialize all the fields. */
+    table_pointer->tbl = malloc(INITIAL_SIZE * sizeof(Symbol)); 
+
+    /* Check return value of Symbol ARRAY to make sure we got memory. */
+    if (table_pointer->tbl == NULL) {
+      free(table_pointer);
+      allocation_failed();
+    }
+
+    table_pointer->len = 0;
+    table_pointer->cap = INITIAL_SIZE; 
+    table_pointer->mode = mode; 
+    // Wow that's confusing. Mode field of SymbolTable = what was passed in. 
+
+    return table_pointer; 
 }
 
 /* Frees the given SymbolTable and all associated memory. */
