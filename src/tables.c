@@ -132,7 +132,7 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
 
     // UNIQUE-NAME
     if (table->mode && (get_addr_for_symbol(table, name) != -1)) {
-      name_already_exists();
+      name_already_exists(name);
       return -1; 
     }
 
