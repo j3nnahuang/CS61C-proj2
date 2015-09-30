@@ -87,7 +87,22 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
    NAME is not present in TABLE, return -1.
  */
 int64_t get_addr_for_symbol(SymbolTable* table, const char* name) {
-    /* YOUR CODE HERE */ 
+    /* YOUR CODE HERE */
+    // Okay hopefully lab02 is good way to go.
+    if (table != NULL) {
+        // Looking for the name
+	// I think have to loop through the entire array to check if name.
+        int i = 0;
+	int array_size = sizeof(*table)/sizeof((*table)[0]);
+	// Hopefully will give me size of the array. 
+        while (i < array_size) {
+   	    if (!strcmp(name, table->tbl[i].name)) {
+	        // Yes we've found the one. 
+	        return table->table[i].addr;
+ 	    }
+	    i++; 
+	}
+    }	 
     return -1;
 }
 
