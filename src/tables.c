@@ -78,6 +78,21 @@ SymbolTable* create_table(int mode) {
 /* Frees the given SymbolTable and all associated memory. */
 void free_table(SymbolTable* table) {
     /* YOUR CODE HERE */
+    // Okay gotta free the array of Symbols, the Symbols in the array, and then the Symbol Table itself. 
+    // According to lab2, don't have to free the pointer to the table though, because on the stack, so will get freed. 
+
+
+    // Ok I think don't need to free the Symbols in the array, b/c weren't malloced. 
+    // Malloc - array would be an array of pointers to Symbols. 
+    // But it's only got 1 star. 
+    // So I'm assuming no malloc. 
+    // So don't need to free the Symbols themselves inside the array. 
+
+    // Free array of Symbols. 
+    free(table->tbl);
+
+    // Free symbol table itself. 
+    free(table);
 }
 
 /* A suggested helper function for copying the contents of a string. */
@@ -107,6 +122,28 @@ static char* create_copy_of_str(const char* str) {
  */
 int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
     /* YOUR CODE HERE */
+
+    // WORD-ALIGNMENT
+    // Word alignment, just divisible by 4. 
+    if (addr % 4) {
+      addr_alignment_incorrect();
+      return -1; 
+    }
+
+    // UNIQUE-NAME
+    if (table->mode && (get_addr_for_symbol(table, name) != -1)) {
+      name_already_exists();
+      return -1; 
+    }
+
+    // RESIZE
+    int table_length = table->len;
+    int table_cap = table->cap;
+    if (table_length >= table_cap) {
+      // LOL WAS HERE CONTINUE ALICE. 
+    }
+
+
     return -1;
 }
 
@@ -118,17 +155,17 @@ int64_t get_addr_for_symbol(SymbolTable* table, const char* name) {
     // Okay hopefully lab02 is good way to go.
     if (table != NULL) {
         // Looking for the name
-	// I think have to loop through the entire array to check if name.
-        int i = 0;
-	int array_size = sizeof(table->tbl) / sizeof((table->tbl)[0]);
-	// Hopefully will give me size of the array. 
+	     // I think have to loop through the entire array to check if name.
+       int i = 0;
+	     int array_size = table->len; 
+	     // Hopefully will give me size of the array. 
         while (i < array_size) {
-   	    if (!strcmp(name, table->tbl[i].name)) {
+   	      if (!strcmp(name, table->tbl[i].name)) {
 	        // Yes we've found the one. 
 	        return table->tbl[i].addr;
- 	    }
-	    i++; 
-	}
+ 	        }
+	        i++; 
+	      }
     }	 
     return -1;
 }
