@@ -58,8 +58,9 @@ int translate_num(long int* output, const char* str, long int lower_bound,
     if (!str || !output) {
         return -1;
     }
-    long int temp = strtol(str, NULL, 0);
-    if (temp != 0 && temp >= lower_bound && temp <= upper_bound) {
+    char* end;
+    long int temp = strtol(str, &end, 0);
+    if (*end == '\0' && temp != 0L && temp >= lower_bound && temp <= upper_bound) {
         *output = temp;
         return 0;
     }
