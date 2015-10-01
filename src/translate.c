@@ -99,12 +99,29 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
  */
 int translate_inst(FILE* output, const char* name, char** args, size_t num_args, uint32_t addr,
     SymbolTable* symtbl, SymbolTable* reltbl) {
+    // num_args seems to be an extra argument - delete?
     if (strcmp(name, "addu") == 0)       return write_rtype (0x21, output, args, num_args);
     else if (strcmp(name, "or") == 0)    return write_rtype (0x25, output, args, num_args);
     else if (strcmp(name, "slt") == 0)   return write_rtype (0x2a, output, args, num_args);
     else if (strcmp(name, "sltu") == 0)  return write_rtype (0x2b, output, args, num_args);
     else if (strcmp(name, "sll") == 0)   return write_shift (0x00, output, args, num_args);
-    /* YOUR CODE HERE */
+    else if (strcmp(name, "jr") == 0)   return write_jr (0x08, output, args, num_args);
+    else if (strcmp(name, "addiu") == 0)   return write_addiu (0x9, output, args, num_args); 
+    else if (strcmp(name, "ori") == 0)   return write_ori (0xd, output, args, num_args); 
+    else if (strcmp(name, "lui") == 0)   return write_lui (0xf, output, args, num_args);
+    else if (strcmp(name, "lb") == 0)   return write_mem (0x20, output, args, num_args);
+    else if (strcmp(name, "lbu") == 0)   return write_mem (0x24, output, args, num_args);
+    else if (strcmp(name, "lw") == 0)   return write_mem (0x23, output, args, num_args);
+    else if (strcmp(name, "sb") == 0)   return write_mem (0x28, output, args, num_args);
+    else if (strcmp(name, "sw") == 0)   return write_mem (0x2b, output, args, num_args);
+    else if (strcmp(name, "beq") == 0)   return write_branch (0x4, output, args, num_args);
+    else if (strcmp(name, "bne") == 0)   return write_branch (0x5, output, args, num_args);
+    else if (strcmp(name, "j") == 0)   return write_jump (0x2, output, args, num_args);
+    else if (strcmp(name, "jal") == 0)   return write_jump (0x3, output, args, num_args);
+    else if (strcmp(name, "mult") == 0)   return write_rtype (0x18, output, args, num_args);
+    else if (strcmp(name, "div") == 0)   return write_rtype (0x1a, output, args, num_args);
+    else if (strcmp(name, "mfhi") == 0)   return write_rtype (0x10, output, args, num_args);
+    else if (strcmp(name, "mflo") == 0)   return write_rtype (0x12, output, args, num_args);
     else                                 return -1;
 }
 
@@ -117,6 +134,8 @@ int translate_inst(FILE* output, const char* name, char** args, size_t num_args,
  */
 int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
     // Perhaps perform some error checking?
+
+    // What is the order of the arguments? If from least to most significant bit, then args should hold funct, sham, rd, rt, rs, opcode in order
 
     int rd = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
