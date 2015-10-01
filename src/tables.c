@@ -183,8 +183,8 @@ int64_t get_addr_for_symbol(SymbolTable* table, const char* name) {
 	     // Hopefully will give me size of the array. 
         while (i < array_size) {
    	      if (!strcmp(name, table->tbl[i].name)) {
-	        // Yes we've found the one. 
-	        return table->tbl[i].addr;
+	           // Yes we've found the one. 
+	           return table->tbl[i].addr;
  	        }
 	        i++; 
 	      }
@@ -192,9 +192,28 @@ int64_t get_addr_for_symbol(SymbolTable* table, const char* name) {
     return -1;
 }
 
+// HEY ALICE LISTEN TO THIS
+// All the test_tables tests passed before I even wrote write_table. 
+// So make sure to write a test for this.
+// You hear me WRITE A TEST FOR WRITE_TABLE 
+
+
+
 /* Writes the SymbolTable TABLE to OUTPUT. You should use write_symbol() to
    perform the write. Do not print any additional whitespace or characters.
  */
 void write_table(SymbolTable* table, FILE* output) {
     /* YOUR CODE HERE */
+    // So...I guess I'm just going through all the entries and printing them. 
+    if (table != NULL) {
+      int i = 0;
+      int array_size = table -> len;
+      while (i < array_size) {
+        // Print yourself. 
+        write_symbol(output, (table -> tbl)[i].addr, (table -> tbl)[i].name);
+
+        i++; 
+      }
+    }
+
 }
