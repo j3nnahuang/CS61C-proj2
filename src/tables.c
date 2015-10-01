@@ -140,11 +140,33 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
     int table_length = table->len;
     int table_cap = table->cap;
     if (table_length >= table_cap) {
-      // LOL WAS HERE CONTINUE ALICE. 
+      // Realloc supes nice. 
+      // Moves pointer AND content for you if it moved it.
+      // Also auto frees old block if moved. 
+      table->tbl = realloc(table->tbl, table_length * SCALING_FACTOR * sizeof(Symbol));
+      // Realloc does bytes. 
+
+      // Make sure memory allocation succeeded
+      if (table -> tbl == NULL) {
+        allocation_failed();
+      }
+
+      // Update length and cap. 
+      table -> len = table_length * SCALING_FACTOR; 
+      table -> cap = table_cap * SCALING_FACTOR; 
     }
 
+    // Now just store the symbol name and address and return 0. 
+    // All errors should be taken care of. 
+    Symbol new_entry; 
+    new_entry.name = create_copy_of_str(name);
+    new_entry.addr = addr;
+    (table -> tbl)[table_length] = new_entry;
 
-    return -1;
+    // INCREMENT LEN
+    table -> len = table_length + 1; 
+
+    return 0;
 }
 
 /* Returns the address (byte offset) of the given symbol. If a symbol with name
