@@ -89,13 +89,55 @@ int check_num_args(int num_args, int correct_num_args) {
 
 int li_can_rep_32 (char** args) {
     // Range from min value of signed int to max value of unsigned ints
-    // Immediate should be 2nd arg. 
-    int imm = (**args)
-    if ()
+    // Immediate should be 2nd arg.
+    // **args here, apparently, is an array of strings. 
+    // Array of char*s = array of strings. 
+    int imm = args[1]; 
+    INT16_MIN, INT16_MAX
+    if (imm >= INT32_MIN && imm <= UINT32_MAX) {
+        return 1;
+    }
+    return 0; 
 }
 
-const char* li_expansion(char** args, int num_args) {
-    // 
+void li_expansion(char** args, int num_args, FILE* output) {
+    // Check if can fit in imm field of an addiu instruction; optimization.
+    // Addiu = I format = 16 bits. 
+    // 1st arg = reg dest; 2nd arg = value
+    char* end; 
+    long int imm = strtol(args[1], &end, 0);
+    if (imm >= INT16_MIN && imm <= UINT16_MAX) {
+      // Make addiu instruction. 
+      // addiu $dest $base value 
+      fprintf(output, "addiu %s, $0, %i\n", args[0], imm);
+      return; 
+    }
+
+    // Otherwise expand into lui-ori.
+    // lui $at, num
+    // ori $at, $at, immediate
+    // addu $dest, $dest, $at
+
+    // How grab first 16 bits?
+    char* value = args[1]; 
+    char* first16;
+    char* last16;
+    int i;
+    for (i = 0; i < 16; i++) {
+        first16[i] = value[i];
+    }
+    for (i = 16; i < 32; i++) {
+      last16[i] = value[i];
+    }
+
+    // OMG I HAVE NO IDEA HOW TO GRAB THE FIRST 16 BITS
+
+    fprintf(output, "lui $at, %s\n", first16);
+    fprintf(output, "ori $at, $at, %s\n", last16);
+
+
+
+    // DON'T FORGET TO WRITE!!!
 }
 
 /* Writes the instruction in hexadecimal format to OUTPUT during pass #2.
