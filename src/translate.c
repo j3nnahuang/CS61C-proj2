@@ -45,6 +45,10 @@ const int TWO_POW_SEVENTEEN = 131072;    // 2^17
 unsigned write_pass_one(FILE* output, const char* name, char** args, int num_args) {
     if (strcmp(name, "li") == 0) {
         /* YOUR CODE HERE */
+        // li should take in 2 args. 
+        if (check_num_args(num_args, 2) && li_can_rep_32(args)) {
+
+        }
         return 0;  
     } else if (strcmp(name, "move") == 0) {
         /* YOUR CODE HERE */
@@ -74,6 +78,24 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
     write_inst_string(output, name, args, num_args);
     return 1;
 
+}
+
+int check_num_args(int num_args, int correct_num_args) {
+    if (num_args == correct_num_args) {
+      return 1;
+    }
+    return 0; 
+}
+
+int li_can_rep_32 (char** args) {
+    // Range from min value of signed int to max value of unsigned ints
+    // Immediate should be 2nd arg. 
+    int imm = (**args)
+    if ()
+}
+
+const char* li_expansion(char** args, int num_args) {
+    // 
 }
 
 /* Writes the instruction in hexadecimal format to OUTPUT during pass #2.
