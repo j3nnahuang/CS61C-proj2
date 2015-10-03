@@ -131,7 +131,7 @@ int blt_expansion(char** args, int num_args, FILE* output) {
     // And then use bne with zero
     //int failure;
     int num_instruct = 0;
-    // Slt $at, arg[0], arg[1]
+    // Slt $at, args[0], args[1]
     // char** slt_args;
     // slt_args[0] = "$at";
     // slt_args[1] = args[0];
@@ -141,7 +141,7 @@ int blt_expansion(char** args, int num_args, FILE* output) {
     //   num_instruct++;
     // }
 
-    fprintf(output, "slt $at, %s, %s\n", arg[0], arg[1]);
+    fprintf(output, "slt $at, %s, %s\n", args[0], args[1]);
     num_instruct++;
 
     // slt would be 1 if indeed less than. Otherwise 0.
