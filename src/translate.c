@@ -176,6 +176,21 @@ int bgt_expansion(char** args, FILE* output) {
     return num_instruct; 
 }
 
+int traddu_expansion(char** args, FILE* output) {
+     int num_instruct = 0; 
+     // Traddu is just a triple add instead of a double add. 
+     // I'll just addu the first 2 and put into $at, then addu $at with the last one and put into final dest. 
+     // addu $at, args[0], args[1]
+     fprintf(output, "addu $at, %s, %s\n", args[0], args[1]);
+     num_instruct++;
+
+     // addu args[0], $at, args[2]
+     fprintf(output, "addu %s, $at, %s", args[0], args[2]);
+     num_instruct++; 
+
+     return num_instruct; 
+}
+
 
 
 
@@ -210,6 +225,9 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
         return 0;  
     } else if (strcmp(name, "traddu") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+            return traddu_expansion(args, output);
+        }
         return 0;       
     } else if (strcmp(name, "swpr") == 0) {
         /* YOUR CODE HERE */
