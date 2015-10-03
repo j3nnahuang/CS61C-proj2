@@ -116,12 +116,12 @@ int li_expansion(char** args, int num_args, FILE* output) {
 
 int move_expansion(char** args, int num_args, FILE* output) {
     // Move is like basically just addu. 
-    int failure;
+    // args: first is dest, 2nd is what is being copied
+    // addiu args[0], args[1], $0; 
+    //int failure;
     int num_instruct = 0;
-    failure = write_rtype(33, output, args, num_args);
-    if (!failure) {
-        num_instruct++;
-    }
+    fprintf(output, "addiu %s, %s, $0\n", args[0], args[1]);
+    num_instruct++;
     return num_instruct;
 }
 
