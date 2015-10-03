@@ -77,11 +77,11 @@ int li_expansion(char** args, int num_args, FILE* output) {
     }
 
     int num_instruct = 0;  
-    if (imm >= INT16_MIN && imm <= UINT16_MAX) {
+    if ((*imm_pointer) >= INT16_MIN && (*imm_pointer) <= UINT16_MAX) {
       // Make addiu instruction. 
       // addiu $dest $base value 
       // failure = write_addiu(9, output, args, num_args);
-      fprintf(output, "addiu %s, $0, %i\n", args[0], *imm_pointer);
+      fprintf(output, "addiu %s, $0, %li\n", args[0], *imm_pointer);
       num_instruct++;
 
       // if (!failure) {
