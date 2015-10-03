@@ -47,9 +47,9 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
         /* YOUR CODE HERE */
         // li should take in 2 args. 
         if (check_num_args(num_args, 2) && li_can_rep_32(args)) {
-
+            return li_expansion(args, num_args, output);
         }
-        return 0;  
+        return 0; // For very primal bad errors. 
     } else if (strcmp(name, "move") == 0) {
         /* YOUR CODE HERE */
         return 0;  
@@ -100,44 +100,38 @@ int li_can_rep_32 (char** args) {
     return 0; 
 }
 
-void li_expansion(char** args, int num_args, FILE* output) {
+/* Should return # instructions written. */
+int li_expansion(char** args, int num_args, FILE* output) {
     // Check if can fit in imm field of an addiu instruction; optimization.
-    // Addiu = I format = 16 bits. 
-    // 1st arg = reg dest; 2nd arg = value
     char* end; 
     long int imm = strtol(args[1], &end, 0);
+    int failure;
+    int num_instruct = 0;  
     if (imm >= INT16_MIN && imm <= UINT16_MAX) {
       // Make addiu instruction. 
       // addiu $dest $base value 
-      fprintf(output, "addiu %s, $0, %i\n", args[0], imm);
-      return; 
+      failure = write_addiu(9, output, args, num_args);
+      if (!failure) {
+        num_instruct++;
+      }
+    } else {
+
+      // Otherwise expand into lui-ori.
+      // lui $at, num
+      // ori $at, $at, immediate
+      // addu $dest, $dest, $at
+
+      failure = write_lui(15, output, args, num_args);
+      if (!failure) {
+          num_instruct++;
+      }
+      failure = write_ori(13, output, args, num_args);
+      if (!failure) {
+          num_instruct++;
+      }
     }
-
-    // Otherwise expand into lui-ori.
-    // lui $at, num
-    // ori $at, $at, immediate
-    // addu $dest, $dest, $at
-
-    // How grab first 16 bits?
-    char* value = args[1]; 
-    char* first16;
-    char* last16;
-    int i;
-    for (i = 0; i < 16; i++) {
-        first16[i] = value[i];
-    }
-    for (i = 16; i < 32; i++) {
-      last16[i] = value[i];
-    }
-
-    // OMG I HAVE NO IDEA HOW TO GRAB THE FIRST 16 BITS
-
-    fprintf(output, "lui $at, %s\n", first16);
-    fprintf(output, "ori $at, $at, %s\n", last16);
-
-
-
-    // DON'T FORGET TO WRITE!!!
+    return num_instruct; 
+    
 }
 
 /* Writes the instruction in hexadecimal format to OUTPUT during pass #2.
