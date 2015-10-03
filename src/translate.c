@@ -215,7 +215,7 @@ int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
         instruction += imm;
         instruction += (rt << 16);
         instruction += (rs << 21);
-        instruction += (opcode << 27);
+        instruction += (opcode << 26);
         write_inst_hex(output, instruction);
         return 0;
     } 
@@ -258,7 +258,7 @@ int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args) {
         // ORDER: opcode, rs=0, rt, imm
         instruction += imm;
         instruction += (rt << 16);
-        instruction += (opcode << 27);
+        instruction += (opcode << 26);
         write_inst_hex(output, instruction);
         return 0;
     }
@@ -281,7 +281,7 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
         instruction += imm;
         instruction += (rt << 16);
         instruction += (rs << 21);
-        instruction += (opcode << 27);
+        instruction += (opcode << 26);
         write_inst_hex(output, instruction);
         return 0;
     }
@@ -342,7 +342,7 @@ int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, uint3
     uint32_t instruction = 0;
     // ORDER: opcode, addr
     instruction += label_addr;
-    instruction += (opcode << 27);
+    instruction += (opcode << 26);
     write_inst_hex(output, instruction);
     return 0;
 }
