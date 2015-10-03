@@ -42,43 +42,7 @@ const int TWO_POW_SEVENTEEN = 131072;    // 2^17
 
    Returns the number of instructions written (so 0 if there were any errors).
  */
-unsigned write_pass_one(FILE* output, const char* name, char** args, int num_args) {
-    if (strcmp(name, "li") == 0) {
-        /* YOUR CODE HERE */
-        // li should take in 2 args. 
-        if (check_num_args(num_args, 2) && li_can_rep_32(args)) {
-            return li_expansion(args, num_args, output);
-        }
-        return 0; // For very primal bad errors. 
-    } else if (strcmp(name, "move") == 0) {
-        /* YOUR CODE HERE */
-        return 0;  
-    } else if (strcmp(name, "blt") == 0) {
-        /* YOUR CODE HERE */
-        return 0;  
-    } else if (strcmp(name, "bgt") == 0) {
-        /* YOUR CODE HERE */
-        return 0;  
-    } else if (strcmp(name, "traddu") == 0) {
-        /* YOUR CODE HERE */
-        return 0;       
-    } else if (strcmp(name, "swpr") == 0) {
-        /* YOUR CODE HERE */
-        return 0;       
-    } else if (strcmp(name, "mul") == 0) {
-        /* YOUR CODE HERE */
-        return 0;       
-    } else if (strcmp(name, "div") == 0) {
-        /* YOUR CODE HERE */
-        return 0;       
-    } else if (strcmp(name, "rem") == 0) {
-        /* YOUR CODE HERE */
-        return 0;       
-    } 
-    write_inst_string(output, name, args, num_args);
-    return 1;
 
-}
 
 int check_num_args(int num_args, int correct_num_args) {
     if (num_args == correct_num_args) {
@@ -133,6 +97,48 @@ int li_expansion(char** args, int num_args, FILE* output) {
     return num_instruct; 
     
 }
+
+
+
+unsigned write_pass_one(FILE* output, const char* name, char** args, int num_args) {
+    if (strcmp(name, "li") == 0) {
+        /* YOUR CODE HERE */
+        // li should take in 2 args. 
+        if (check_num_args(num_args, 2) && li_can_rep_32(args)) {
+            return li_expansion(args, num_args, output);
+        }
+        return 0; // For very primal bad errors. 
+    } else if (strcmp(name, "move") == 0) {
+        /* YOUR CODE HERE */
+        return 0;  
+    } else if (strcmp(name, "blt") == 0) {
+        /* YOUR CODE HERE */
+        return 0;  
+    } else if (strcmp(name, "bgt") == 0) {
+        /* YOUR CODE HERE */
+        return 0;  
+    } else if (strcmp(name, "traddu") == 0) {
+        /* YOUR CODE HERE */
+        return 0;       
+    } else if (strcmp(name, "swpr") == 0) {
+        /* YOUR CODE HERE */
+        return 0;       
+    } else if (strcmp(name, "mul") == 0) {
+        /* YOUR CODE HERE */
+        return 0;       
+    } else if (strcmp(name, "div") == 0) {
+        /* YOUR CODE HERE */
+        return 0;       
+    } else if (strcmp(name, "rem") == 0) {
+        /* YOUR CODE HERE */
+        return 0;       
+    } 
+    write_inst_string(output, name, args, num_args);
+    return 1;
+
+}
+
+
 
 /* Writes the instruction in hexadecimal format to OUTPUT during pass #2.
    
