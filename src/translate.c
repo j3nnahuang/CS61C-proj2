@@ -67,7 +67,7 @@ int li_can_rep_32 (char** args) {
 /* Should return # instructions written. */
 int li_expansion(char** args, int num_args, FILE* output) {
     // Check if can fit in imm field of an addiu instruction; optimization.
-    char* end; 
+    //sdfsdfsdfchar* end; 
     //long int imm = strtol(args[1], &end, 0);
     int failure;
     long int* imm_pointer; 
@@ -129,11 +129,11 @@ int move_expansion(char** args, int num_args, FILE* output) {
 int blt_expansion(char** args, int num_args, FILE* output) {
     // Want to use slt to get 1
     // And then use bne with zero
-    int failure
+    int failure;
     int num_instruct = 0;
     // Slt $at, arg[0], arg[1]
     char** slt_args;
-    slt_args[0] = "$at"
+    slt_args[0] = "$at";
     slt_args[1] = args[0];
     slt_args[2] = args[1];
     failure = write_rtype(42, output, slt_args, 3);
@@ -149,7 +149,7 @@ int blt_expansion(char** args, int num_args, FILE* output) {
     bne_args[1] = "$0";
     bne_args[2] = args[2];
     // PC + 4. BUT HOW GET PC OMG
-    failure = write_branch(5, output, bne_args, 3, )
+    //failure = write_branch(5, output, bne_args, 3, )
 }
 
 
@@ -175,7 +175,7 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
     } else if (strcmp(name, "blt") == 0) {
         /* YOUR CODE HERE */
         if (check_num_args(num_args, 3)) {
-            STUFFFFF
+            //STUFFFFF
         }
         return 0;  
     } else if (strcmp(name, "bgt") == 0) {
