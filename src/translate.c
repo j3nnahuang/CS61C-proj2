@@ -129,25 +129,33 @@ int move_expansion(char** args, int num_args, FILE* output) {
 int blt_expansion(char** args, int num_args, FILE* output) {
     // Want to use slt to get 1
     // And then use bne with zero
-    int failure;
+    //int failure;
     int num_instruct = 0;
     // Slt $at, arg[0], arg[1]
-    char** slt_args;
-    slt_args[0] = "$at";
-    slt_args[1] = args[0];
-    slt_args[2] = args[1];
-    failure = write_rtype(42, output, slt_args, 3);
-    if (!failure) {
-      num_instruct++;
-    }
+    // char** slt_args;
+    // slt_args[0] = "$at";
+    // slt_args[1] = args[0];
+    // slt_args[2] = args[1];
+    // failure = write_rtype(42, output, slt_args, 3);
+    // if (!failure) {
+    //   num_instruct++;
+    // }
+
+    fprintf(output, "slt $at, %s, %s\n", arg[0], arg[1]);
+    num_instruct++;
+
     // slt would be 1 if indeed less than. Otherwise 0.
 
     // Now bne
     // bne $at, $0, args[2]
-    char** bne_args;
-    bne_args[0] = "$at";
-    bne_args[1] = "$0";
-    bne_args[2] = args[2];
+    // char** bne_args;
+    // bne_args[0] = "$at";
+    // bne_args[1] = "$0";
+    // bne_args[2] = args[2];
+    fprintf(output, "bne $at, $0, %s\n", args[2]);
+    num_instruct++;
+
+    return num_instruct; 
     // PC + 4. BUT HOW GET PC OMG
     //failure = write_branch(5, output, bne_args, 3, )
 }
@@ -175,11 +183,15 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
     } else if (strcmp(name, "blt") == 0) {
         /* YOUR CODE HERE */
         if (check_num_args(num_args, 3)) {
-            //STUFFFFF
+            return blt_expansion(args, num_args, output);
         }
         return 0;  
     } else if (strcmp(name, "bgt") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+          //STUFFFFFF
+        }
+
         return 0;  
     } else if (strcmp(name, "traddu") == 0) {
         /* YOUR CODE HERE */
