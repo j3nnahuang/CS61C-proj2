@@ -215,6 +215,27 @@ int swpr_expansion(char** args, FILE* output) {
     return num_instruct;
 }
 
+int mul_expansion(char** args, FILE* output) {
+    int num_instruct = 0;
+
+    // Wants the lower 32 bits of the product - $lo. 
+
+    // Becomes mult and mflo
+    // Mult - hilo get the full 64 bits. Hi = upper, lo = lower. 
+    // So if want the lower 32, just grab lo. 
+
+    // mult args[1], args[2]
+    fprintf("mult %s, %s\n", args[1], args[2]);
+    num_instruct++;
+
+    // Wanted is in $lo now - move it
+    // mflo args[0]
+    fprintf("mflo %s\n", args[0]);
+    num_instruct++;
+
+    return num_instruct; 
+}
+
 
 
 
@@ -261,6 +282,9 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
         return 0;       
     } else if (strcmp(name, "mul") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+            return mul_expansion(args, output);
+        }
         return 0;       
     } else if (strcmp(name, "div") == 0) {
         /* YOUR CODE HERE */
