@@ -65,7 +65,7 @@ int li_can_rep_32 (char** args) {
 }
 
 /* Should return # instructions written. */
-int li_expansion(char** args, int num_args, FILE* output) {
+int li_expansion(char** args, FILE* output) {
     // Check if can fit in imm field of an addiu instruction; optimization.
     //sdfsdfsdfchar* end; 
     //long int imm = strtol(args[1], &end, 0);
@@ -114,7 +114,7 @@ int li_expansion(char** args, int num_args, FILE* output) {
 }
 
 
-int move_expansion(char** args, int num_args, FILE* output) {
+int move_expansion(char** args, FILE* output) {
     // Move is like basically just addu. 
     // args: first is dest, 2nd is what is being copied
     // addiu args[0], args[1], $0; 
@@ -126,7 +126,7 @@ int move_expansion(char** args, int num_args, FILE* output) {
 }
 
 
-int blt_expansion(char** args, int num_args, FILE* output) {
+int blt_expansion(char** args, FILE* output) {
     // Want to use slt to get 1
     // And then use bne with zero
     //int failure;
@@ -160,6 +160,22 @@ int blt_expansion(char** args, int num_args, FILE* output) {
     //failure = write_branch(5, output, bne_args, 3, )
 }
 
+int bgt_expansion(char** args, FILE* output) {
+    int num_instruct = 0;
+    // Same as blt I think, just flip the registers when slt.
+    // Just to make sure = case doesn't get caught up. 
+
+    // slt $at, args[1], args[0]
+    fprintf(output, "slt $at, %s, %s\n", args[1], args[0]);
+    num_instruct++;
+
+    // bne $at, $0, args[2]
+    fprintf(output, "bne $at, $0, %s\n", args[2]);;
+    num_instruct++;
+
+    return num_instruct; 
+}
+
 
 
 
@@ -170,28 +186,27 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
         /* YOUR CODE HERE */
         // li should take in 2 args. 
         if (check_num_args(num_args, 2) && li_can_rep_32(args)) {
-            return li_expansion(args, num_args, output);
+            return li_expansion(args, output);
         }
         return 0; // For very primal bad errors. 
     } else if (strcmp(name, "move") == 0) {
         /* YOUR CODE HERE */
         // move should take in 2 args
         if (check_num_args(num_args, 2)) {
-            return move_expansion(args, num_args, output);
+            return move_expansion(args, output);
         }
         return 0;  
     } else if (strcmp(name, "blt") == 0) {
         /* YOUR CODE HERE */
         if (check_num_args(num_args, 3)) {
-            return blt_expansion(args, num_args, output);
+            return blt_expansion(args, output);
         }
         return 0;  
     } else if (strcmp(name, "bgt") == 0) {
         /* YOUR CODE HERE */
         if (check_num_args(num_args, 3)) {
-          //STUFFFFFF
+            return bgt_expansion(args, output);
         }
-
         return 0;  
     } else if (strcmp(name, "traddu") == 0) {
         /* YOUR CODE HERE */
