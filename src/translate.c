@@ -55,9 +55,9 @@ int li_can_rep_32 (char** args) {
     // Range from min value of signed int to max value of unsigned ints
     // Immediate should be 2nd arg.
     // **args here, apparently, is an array of strings. 
-    // Array of char*s = array of strings. 
-    int imm = args[1]; 
-    INT16_MIN, INT16_MAX
+    // Array of char*s = array of strings.
+    char* end;  
+    long int imm = strtol(args[1], &end, 0);
     if (imm >= INT32_MIN && imm <= UINT32_MAX) {
         return 1;
     }
