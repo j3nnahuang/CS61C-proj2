@@ -68,16 +68,25 @@ int li_can_rep_32 (char** args) {
 int li_expansion(char** args, int num_args, FILE* output) {
     // Check if can fit in imm field of an addiu instruction; optimization.
     char* end; 
-    long int imm = strtol(args[1], &end, 0);
+    //long int imm = strtol(args[1], &end, 0);
     int failure;
+    long int* imm_pointer; 
+    failure = translate_num(imm_pointer, args[1], INT32_MIN, UINT32_MAX);
+    if (failure) {
+      return 0; 
+    }
+
     int num_instruct = 0;  
     if (imm >= INT16_MIN && imm <= UINT16_MAX) {
       // Make addiu instruction. 
       // addiu $dest $base value 
-      failure = write_addiu(9, output, args, num_args);
-      if (!failure) {
-        num_instruct++;
-      }
+      // failure = write_addiu(9, output, args, num_args);
+      fprintf(output, "addiu %s, $0, %i\n", args[0], *imm_pointer);
+      num_instruct++;
+
+      // if (!failure) {
+      //   num_instruct++;
+      // }
     } else {
 
       // Otherwise expand into lui-ori.
@@ -85,18 +94,66 @@ int li_expansion(char** args, int num_args, FILE* output) {
       // ori $at, $at, immediate
       // addu $dest, $dest, $at
 
-      failure = write_lui(15, output, args, num_args);
-      if (!failure) {
-          num_instruct++;
-      }
-      failure = write_ori(13, output, args, num_args);
-      if (!failure) {
-          num_instruct++;
-      }
+      //failure = write_lui(15, output, args, num_args);
+      // Want first 16 bits = logical shift 
+      int lui_int = (*imm_pointer) >> 16; 
+      fprintf(output, "lui $at, %i\n", lui_int);
+      num_instruct++;
+
+      // Okay should be fine; shifting won't change the original value. 
+      //failure = write_ori(13, output, args, num_args);
+      int ori_int = (*imm_pointer) << 16; 
+      fprintf(output, "ori $at, $at, %i\n", ori_int);
+      num_instruct++;
+      // if (!failure) {
+      //     num_instruct++;
+      // }
     }
     return num_instruct; 
     
 }
+
+
+int move_expansion(char** args, int num_args, FILE* output) {
+    // Move is like basically just addu. 
+    int failure;
+    int num_instruct = 0;
+    failure = write_rtype(33, output, args, num_args);
+    if (!failure) {
+        num_instruct++;
+    }
+    return num_instruct;
+}
+
+
+int blt_expansion(char** args, int num_args, FILE* output) {
+    // Want to use slt to get 1
+    // And then use bne with zero
+    int failure
+    int num_instruct = 0;
+    // Slt $at, arg[0], arg[1]
+    char** slt_args;
+    slt_args[0] = "$at"
+    slt_args[1] = args[0];
+    slt_args[2] = args[1];
+    failure = write_rtype(42, output, slt_args, 3);
+    if (!failure) {
+      num_instruct++;
+    }
+    // slt would be 1 if indeed less than. Otherwise 0.
+
+    // Now bne
+    // bne $at, $0, args[2]
+    char** bne_args;
+    bne_args[0] = "$at";
+    bne_args[1] = "$0";
+    bne_args[2] = args[2];
+    // PC + 4. BUT HOW GET PC OMG
+    failure = write_branch(5, output, bne_args, 3, )
+}
+
+
+
 
 
 
@@ -110,9 +167,16 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
         return 0; // For very primal bad errors. 
     } else if (strcmp(name, "move") == 0) {
         /* YOUR CODE HERE */
+        // move should take in 2 args
+        if (check_num_args(num_args, 2)) {
+            return move_expansion(args, num_args, output);
+        }
         return 0;  
     } else if (strcmp(name, "blt") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+            STUFFFFF
+        }
         return 0;  
     } else if (strcmp(name, "bgt") == 0) {
         /* YOUR CODE HERE */
