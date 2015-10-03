@@ -255,7 +255,7 @@ int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args) {
 
     if (err != -1) {
         uint32_t instruction = 0;
-        // ORDER: opcode, rs, rt, imm
+        // ORDER: opcode, rs=0, rt, imm
         instruction += imm;
         instruction += (rt << 16);
         instruction += (opcode << 27);
@@ -280,6 +280,7 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
         // ORDER: opcode, rs, rt, imm
         instruction += imm;
         instruction += (rt << 16);
+        instruction += (rs << 21);
         instruction += (opcode << 27);
         write_inst_hex(output, instruction);
         return 0;
@@ -337,6 +338,7 @@ int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, uint3
         // if no address is found, set the address to 0 and
         label_addr = 0;
     }
+    add_to_table(reltbl, args[0], label_addr);
     uint32_t instruction = 0;
     // ORDER: opcode, addr
     instruction += label_addr;
