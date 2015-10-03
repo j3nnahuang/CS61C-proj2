@@ -42,39 +42,297 @@ const int TWO_POW_SEVENTEEN = 131072;    // 2^17
 
    Returns the number of instructions written (so 0 if there were any errors).
  */
+
+
+int check_num_args(int num_args, int correct_num_args) {
+    if (num_args == correct_num_args) {
+      return 1;
+    }
+    return 0; 
+}
+
+int li_can_rep_32 (char** args) {
+    // Range from min value of signed int to max value of unsigned ints
+    // Immediate should be 2nd arg.
+    // **args here, apparently, is an array of strings. 
+    // Array of char*s = array of strings.
+    char* end;  
+    long int imm = strtol(args[1], &end, 0);
+    if (imm >= INT32_MIN && imm <= UINT32_MAX) {
+        return 1;
+    }
+    return 0; 
+}
+
+/* Should return # instructions written. */
+int li_expansion(char** args, FILE* output) {
+    // Check if can fit in imm field of an addiu instruction; optimization.
+    //sdfsdfsdfchar* end; 
+    //long int imm = strtol(args[1], &end, 0);
+    int failure;
+    long int* imm_pointer; 
+    failure = translate_num(imm_pointer, args[1], INT32_MIN, UINT32_MAX);
+    if (failure) {
+      return 0; 
+    }
+
+    int num_instruct = 0;  
+    if ((*imm_pointer) >= INT16_MIN && (*imm_pointer) <= UINT16_MAX) {
+      // Make addiu instruction. 
+      // addiu $dest $base value 
+      // failure = write_addiu(9, output, args, num_args);
+      fprintf(output, "addiu %s, $0, %li\n", args[0], *imm_pointer);
+      num_instruct++;
+
+      // if (!failure) {
+      //   num_instruct++;
+      // }
+    } else {
+
+      // Otherwise expand into lui-ori.
+      // lui $at, num
+      // ori $at, $at, immediate
+      // addu $dest, $dest, $at
+
+      //failure = write_lui(15, output, args, num_args);
+      // Want first 16 bits = logical shift 
+      int lui_int = (*imm_pointer) >> 16; 
+      fprintf(output, "lui $at, %i\n", lui_int);
+      num_instruct++;
+
+      // Okay should be fine; shifting won't change the original value. 
+      //failure = write_ori(13, output, args, num_args);
+      int ori_int = (*imm_pointer) << 16; 
+      fprintf(output, "ori $at, $at, %i\n", ori_int);
+      num_instruct++;
+      // if (!failure) {
+      //     num_instruct++;
+      // }
+    }
+    return num_instruct; 
+    
+}
+
+
+int move_expansion(char** args, FILE* output) {
+    // Move is like basically just addu. 
+    // args: first is dest, 2nd is what is being copied
+    // addiu args[0], args[1], $0; 
+    //int failure;
+    int num_instruct = 0;
+    fprintf(output, "addiu %s, %s, $0\n", args[0], args[1]);
+    num_instruct++;
+    return num_instruct;
+}
+
+
+int blt_expansion(char** args, FILE* output) {
+    // Want to use slt to get 1
+    // And then use bne with zero
+    //int failure;
+    int num_instruct = 0;
+    // Slt $at, args[0], args[1]
+    // char** slt_args;
+    // slt_args[0] = "$at";
+    // slt_args[1] = args[0];
+    // slt_args[2] = args[1];
+    // failure = write_rtype(42, output, slt_args, 3);
+    // if (!failure) {
+    //   num_instruct++;
+    // }
+
+    fprintf(output, "slt $at, %s, %s\n", args[0], args[1]);
+    num_instruct++;
+
+    // slt would be 1 if indeed less than. Otherwise 0.
+
+    // Now bne
+    // bne $at, $0, args[2]
+    // char** bne_args;
+    // bne_args[0] = "$at";
+    // bne_args[1] = "$0";
+    // bne_args[2] = args[2];
+    fprintf(output, "bne $at, $0, %s\n", args[2]);
+    num_instruct++;
+
+    return num_instruct; 
+    // PC + 4. BUT HOW GET PC OMG
+    //failure = write_branch(5, output, bne_args, 3, )
+}
+
+int bgt_expansion(char** args, FILE* output) {
+    int num_instruct = 0;
+    // Same as blt I think, just flip the registers when slt.
+    // Just to make sure = case doesn't get caught up. 
+
+    // slt $at, args[1], args[0]
+    fprintf(output, "slt $at, %s, %s\n", args[1], args[0]);
+    num_instruct++;
+
+    // bne $at, $0, args[2]
+    fprintf(output, "bne $at, $0, %s\n", args[2]);;
+    num_instruct++;
+
+    return num_instruct; 
+}
+
+int traddu_expansion(char** args, FILE* output) {
+     int num_instruct = 0; 
+     // Traddu is just a triple add instead of a double add. 
+     // I'll just addu the first 2 and put into $at, then addu $at with the last one and put into final dest. 
+     // addu $at, args[0], args[1]
+     fprintf(output, "addu $at, %s, %s\n", args[0], args[1]);
+     num_instruct++;
+
+     // addu args[0], $at, args[2]
+     fprintf(output, "addu %s, $at, %s", args[0], args[2]);
+     num_instruct++; 
+
+     return num_instruct; 
+}
+
+int swpr_expansion(char** args, FILE* output) {
+    int num_instruct = 0;
+
+    // Swaps the values. 
+    // Save one value to $at, then just add. 
+
+    // Save 1st value in $at. 
+    // addu $at, arg[0], $0
+    fprintf(output, "addu $at, %s, $0\n", args[0]);
+    num_instruct++;
+
+    // Now move 2nd to first.
+    // addu arg[0], arg[1], $0
+    fprintf(output, "addu %s, %s, $0\n", args[0], args[1]);
+    num_instruct++;
+
+    // Now move 1st value (stored in $at) to 2nd. 
+    // addu args[1], $at, $0
+    fprintf(output, "addu %s, $at, $0\n", args[1]);
+    num_instruct++;
+
+    return num_instruct;
+}
+
+int mul_expansion(char** args, FILE* output) {
+    int num_instruct = 0;
+
+    // Wants the lower 32 bits of the product - $lo. 
+
+    // Becomes mult and mflo
+    // Mult - hilo get the full 64 bits. Hi = upper, lo = lower. 
+    // So if want the lower 32, just grab lo. 
+
+    // mult args[1], args[2]
+    fprintf(output, "mult %s, %s\n", args[1], args[2]);
+    num_instruct++;
+
+    // Wanted is in $lo now - move it
+    // mflo args[0]
+    fprintf(output, "mflo %s\n", args[0]);
+    num_instruct++;
+
+    return num_instruct; 
+}
+
+int div_expansion(char** args, FILE* output) {
+    int num_instruct = 0;
+
+    // Return quotient - in lo. 
+    // div args[1] args[2]
+    fprintf(output, "div %s, %s\n", args[1], args[2]);
+    num_instruct++;
+    // mflo args[0]
+    fprintf(output, "mflo %s\n", args[0]);
+    num_instruct++;
+
+    return num_instruct; 
+}
+
+int rem_expansion(char** args, FILE* output) {
+    int num_instruct = 0;
+
+    // It's just like div, but grab from hi instead. 
+    // div args[1] args[2]
+    fprintf(output, "div %s, %s\n", args[1], args[2]);
+    num_instruct++;
+    // mfhi args[0]
+    fprintf(output, "mfhi %s\n", args[0]);
+    num_instruct++;
+
+    return num_instruct; 
+}
+
+
+
+
+
+
 unsigned write_pass_one(FILE* output, const char* name, char** args, int num_args) {
     if (strcmp(name, "li") == 0) {
         /* YOUR CODE HERE */
-        return 0;  
+        // li should take in 2 args. 
+        if (check_num_args(num_args, 2) && li_can_rep_32(args)) {
+            return li_expansion(args, output);
+        }
+        return 0; // For very primal bad errors. 
     } else if (strcmp(name, "move") == 0) {
         /* YOUR CODE HERE */
+        // move should take in 2 args
+        if (check_num_args(num_args, 2)) {
+            return move_expansion(args, output);
+        }
         return 0;  
     } else if (strcmp(name, "blt") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+            return blt_expansion(args, output);
+        }
         return 0;  
     } else if (strcmp(name, "bgt") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+            return bgt_expansion(args, output);
+        }
         return 0;  
     } else if (strcmp(name, "traddu") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+            return traddu_expansion(args, output);
+        }
         return 0;       
     } else if (strcmp(name, "swpr") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 2)) {
+            return swpr_expansion(args, output);
+        }
         return 0;       
     } else if (strcmp(name, "mul") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+            return mul_expansion(args, output);
+        }
         return 0;       
     } else if (strcmp(name, "div") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+            return div_expansion(args, output);
+        }
         return 0;       
     } else if (strcmp(name, "rem") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+            return rem_expansion(args, output);
+        }
         return 0;       
     } 
     write_inst_string(output, name, args, num_args);
     return 1;
 
 }
+
+
 
 /* Writes the instruction in hexadecimal format to OUTPUT during pass #2.
    
