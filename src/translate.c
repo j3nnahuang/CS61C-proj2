@@ -199,17 +199,17 @@ int swpr_expansion(char** args, FILE* output) {
 
     // Save 1st value in $at. 
     // addu $at, arg[0], $0
-    fprintf("addu $at, %s, $0\n", args[0]);
+    fprintf(output, "addu $at, %s, $0\n", args[0]);
     num_instruct++;
 
     // Now move 2nd to first.
     // addu arg[0], arg[1], $0
-    fprintf("addu %s, %s, $0\n", args[0], args[1]);
+    fprintf(output, "addu %s, %s, $0\n", args[0], args[1]);
     num_instruct++;
 
     // Now move 1st value (stored in $at) to 2nd. 
     // addu args[1], $at, $0
-    fprintf("addu %s, $at, $0\n", args[1]);
+    fprintf(output, "addu %s, $at, $0\n", args[1]);
     num_instruct++;
 
     return num_instruct;
@@ -225,12 +225,26 @@ int mul_expansion(char** args, FILE* output) {
     // So if want the lower 32, just grab lo. 
 
     // mult args[1], args[2]
-    fprintf("mult %s, %s\n", args[1], args[2]);
+    fprintf(output, "mult %s, %s\n", args[1], args[2]);
     num_instruct++;
 
     // Wanted is in $lo now - move it
     // mflo args[0]
-    fprintf("mflo %s\n", args[0]);
+    fprintf(output, "mflo %s\n", args[0]);
+    num_instruct++;
+
+    return num_instruct; 
+}
+
+int div_expansion(char **args, FILE* output) {
+    int num_instruct = 0;
+
+    // Return quotient - in lo. 
+    // div args[1] args[2]
+    fprintf(output, "div %s, %s\n", args[1], args[2]);
+    num_instruct++;
+    // mflo args[0]
+    fprintf(output, "mflo %s\n", args[0]);
     num_instruct++;
 
     return num_instruct; 
@@ -288,6 +302,9 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
         return 0;       
     } else if (strcmp(name, "div") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+            return div_expansion(args, output);
+        }
         return 0;       
     } else if (strcmp(name, "rem") == 0) {
         /* YOUR CODE HERE */
