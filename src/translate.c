@@ -236,7 +236,7 @@ int mul_expansion(char** args, FILE* output) {
     return num_instruct; 
 }
 
-int div_expansion(char **args, FILE* output) {
+int div_expansion(char** args, FILE* output) {
     int num_instruct = 0;
 
     // Return quotient - in lo. 
@@ -245,6 +245,20 @@ int div_expansion(char **args, FILE* output) {
     num_instruct++;
     // mflo args[0]
     fprintf(output, "mflo %s\n", args[0]);
+    num_instruct++;
+
+    return num_instruct; 
+}
+
+int rem_expansion(char** args, FILE* output) {
+    int num_instruct = 0;
+
+    // It's just like div, but grab from hi instead. 
+    // div args[1] args[2]
+    fprintf(output, "div %s, %s\n", args[1], args[2]);
+    num_instruct++;
+    // mfhi args[0]
+    fprintf(output, "mfhi %s\n", args[0]);
     num_instruct++;
 
     return num_instruct; 
@@ -308,6 +322,9 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
         return 0;       
     } else if (strcmp(name, "rem") == 0) {
         /* YOUR CODE HERE */
+        if (check_num_args(num_args, 3)) {
+            return rem_expansion(args, output);
+        }
         return 0;       
     } 
     write_inst_string(output, name, args, num_args);
