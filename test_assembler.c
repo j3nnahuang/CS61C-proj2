@@ -10,6 +10,7 @@
 #include "src/translate.h"
 
 const char* TMP_FILE = "test_output.txt";
+const char* OUR_TEST_FILE = "best_test_file_evar.txt";
 const int BUF_SIZE = 1024;
 
 /****************************************
@@ -157,36 +158,311 @@ void test_table_2() {
  *  Add your test cases here
  ****************************************/
 
+void test_addu() {
+    // set_log_file(OUR_TEST_FILE);
+    FILE *file = fopen(TMP_FILE, "r+");
+
+    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(symtbl);
+
+    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(reltbl);
+    
+    char* name = "addu";
+    char* args[3];
+    args[0] = "$s0";
+    args[1] = "$0";
+    args[2] = "$0";
+    size_t num_args = 3;
+    uint32_t addr = 0;
+    
+    int result = translate_inst(file, name, args, num_args, addr, symtbl, reltbl);
+    CU_ASSERT_EQUAL(result, 0);
+
+    fclose(file);
+}
+
+void test_sll() {
+    FILE *file = fopen(TMP_FILE, "a");
+
+    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(symtbl);
+
+    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(reltbl);
+
+    char* name = "sll";
+    char* args[3];
+    args[0] = "$v0";
+    args[1] = "$s1";
+    args[2] = "3";
+    size_t num_args = 3;
+    uint32_t addr = 0;
+
+    int result = translate_inst(file, name, args, num_args, addr, symtbl, reltbl);
+    CU_ASSERT_EQUAL(result, 0);
+
+    fclose(file);
+}
+
+void test_addiu() {
+    FILE *file = fopen(TMP_FILE, "a");
+
+    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(symtbl);
+
+    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(reltbl);
+
+    char* name = "addiu";
+    char* args[3];
+    args[0] = "$a0";
+    args[1] = "$t0";
+    args[2] = "-14";
+    size_t num_args = 3;
+    uint32_t addr = 0;
+
+    int result = translate_inst(file, name, args, num_args, addr, symtbl, reltbl);
+    CU_ASSERT_EQUAL(result, 0);
+
+    fclose(file);
+}
+
+void test_ori() {
+    FILE *file = fopen(TMP_FILE, "a");
+
+    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(symtbl);
+
+    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(reltbl);
+
+    char* name = "ori";
+    char* args[3];
+    args[0] = "$s2";
+    args[1] = "$t1";
+    args[2] = "4";
+    size_t num_args = 3;
+    uint32_t addr = 0;
+
+    int result = translate_inst(file, name, args, num_args, addr, symtbl, reltbl);
+    CU_ASSERT_EQUAL(result, 0);
+
+    fclose(file);
+}
+
+void test_slt() {
+    FILE *file = fopen(TMP_FILE, "a");
+
+    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(symtbl);
+
+    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(reltbl);
+
+    char* name = "slt";
+    char* args[3];
+    args[0] = "$a0";
+    args[1] = "$a1";
+    args[2] = "$a2";
+    size_t num_args = 3;
+    uint32_t addr = 0;
+
+    int result = translate_inst(file, name, args, num_args, addr, symtbl, reltbl);
+    CU_ASSERT_EQUAL(result, 0);
+
+    fclose(file);
+}
+
+void test_lui() {
+    FILE *file = fopen(TMP_FILE, "a");
+
+    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(symtbl);
+
+    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(reltbl);
+
+    char* name = "lui";
+    char* args[2];
+    args[0] = "$a3";
+    args[1] = "17";
+    size_t num_args = 2;
+    uint32_t addr = 0;
+
+    int result = translate_inst(file, name, args, num_args, addr, symtbl, reltbl);
+    CU_ASSERT_EQUAL(result, 0);
+
+    fclose(file);
+}
+
+void test_sw() {
+    FILE *file = fopen(TMP_FILE, "a");
+
+    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(symtbl);
+
+    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(reltbl);
+
+    char* name = "sw";
+    char* args[3];
+    args[0] = "$s3";
+    args[1] = "5";
+    args[2] = "$at";
+    size_t num_args = 3;
+    uint32_t addr = 0;
+
+    int result = translate_inst(file, name, args, num_args, addr, symtbl, reltbl);
+    CU_ASSERT_EQUAL(result, 0);
+
+    fclose(file);
+}
+
+void test_jr() {
+    FILE *file = fopen(TMP_FILE, "a");
+
+    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(symtbl);
+
+    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(reltbl);
+
+    char* name = "jr";
+    char* args[1];
+    args[0] = "$sp";
+    size_t num_args = 1;
+    uint32_t addr = 0;
+
+    int result = translate_inst(file, name, args, num_args, addr, symtbl, reltbl);
+    CU_ASSERT_EQUAL(result, 0);
+
+    fclose(file);
+}
+
+void test_bne() {
+    FILE *file = fopen(TMP_FILE, "a");
+
+    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(symtbl);
+    add_to_table(symtbl, "label", 0x00000000);
+
+    int label_addr = get_addr_for_symbol(symtbl, "label");
+    CU_ASSERT_EQUAL(label_addr, 0);
+
+    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(reltbl);
+
+    char* name = "bne";
+    char* args[3];
+    args[0] = "$t3";
+    args[1] = "$t0";
+    args[2] = "label";
+    size_t num_args = 3;
+    uint32_t addr = 0x00000004;
+
+    int result = translate_inst(file, name, args, num_args, addr, symtbl, reltbl);
+    CU_ASSERT_EQUAL(result, 0);
+
+    fclose(file);
+}
+
+void test_jal() {
+    FILE *file = fopen(TMP_FILE, "a");
+
+    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(symtbl);
+    add_to_table(symtbl, "label", 0x00000004);
+    int label_addr = get_addr_for_symbol(symtbl, "label");
+    CU_ASSERT_EQUAL(label_addr, 4);
+
+    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(reltbl);
+
+    char* name = "jal";
+    char* args[1];
+    args[0] = "label";
+    size_t num_args = 1;
+    uint32_t addr = 0x0000000c;
+
+    int result = translate_inst(file, name, args, num_args, addr, symtbl, reltbl);
+    CU_ASSERT_EQUAL(result, 0);
+
+    int rel_addr = get_addr_for_symbol(reltbl, "label");
+    printf("%d\n", rel_addr);
+    CU_ASSERT_EQUAL(rel_addr, 12);
+    
+    fclose(file);
+}
+
+
 int main(int argc, char** argv) {
-    CU_pSuite pSuite1 = NULL, pSuite2 = NULL;
+    CU_pSuite pSuite1 = NULL, pSuite2 = NULL, pSuite3 = NULL;
 
     if (CUE_SUCCESS != CU_initialize_registry()) {
         return CU_get_error();
     }
 
     /* Suite 1 */
-    pSuite1 = CU_add_suite("Testing translate_utils.c", NULL, NULL);
-    if (!pSuite1) {
+   // pSuite1 = CU_add_suite("Testing translate_utils.c", NULL, NULL);
+   // if (!pSuite1) {
+     //   goto exit;
+   // }
+   // if (!CU_add_test(pSuite1, "test_translate_reg", test_translate_reg)) {
+   //     goto exit;
+   // }
+   // if (!CU_add_test(pSuite1, "test_translate_num", test_translate_num)) {
+   //     goto exit;
+   // }
+
+    /* Suite 2 */
+   // pSuite2 = CU_add_suite("Testing tables.c", init_log_file, NULL);
+   // if (!pSuite2) {
+   //     goto exit;
+   // }
+   // if (!CU_add_test(pSuite2, "test_table_1", test_table_1)) {
+      //  goto exit;
+    //}
+   // if (!CU_add_test(pSuite2, "test_table_2", test_table_2)) {
+     //   goto exit;
+   // }
+
+    /* Suite 3 */
+    pSuite3 = CU_add_suite("Testing translate.c", NULL, NULL);
+    if (!pSuite3) {
         goto exit;
     }
-    if (!CU_add_test(pSuite1, "test_translate_reg", test_translate_reg)) {
+    if (!CU_add_test(pSuite3, "test_addu", test_addu)) {
         goto exit;
     }
-    if (!CU_add_test(pSuite1, "test_translate_num", test_translate_num)) {
+    if (!CU_add_test(pSuite3, "test_sll", test_sll)) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite3, "test_addiu", test_addiu)) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite3, "test_ori", test_ori)) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite3, "test_slt", test_slt)) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite3, "test_lui", test_lui)) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite3, "test_sw", test_sw)) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite3, "test_jr", test_jr)) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite3, "test_bne", test_bne)) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite3, "test_jal", test_jal)) {
         goto exit;
     }
 
-    /* Suite 2 */
-    pSuite2 = CU_add_suite("Testing tables.c", init_log_file, NULL);
-    if (!pSuite2) {
-        goto exit;
-    }
-    if (!CU_add_test(pSuite2, "test_table_1", test_table_1)) {
-        goto exit;
-    }
-    if (!CU_add_test(pSuite2, "test_table_2", test_table_2)) {
-        goto exit;
-    }
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();
