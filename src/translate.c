@@ -364,7 +364,7 @@ int translate_inst(FILE* output, const char* name, char** args, size_t num_args,
     else if (strcmp(name, "sll") == 0)   return write_shift (0x00, output, args, num_args);
     else if (strcmp(name, "jr") == 0)   return write_jr (0x08, output, args, num_args);
     else if (strcmp(name, "addiu") == 0)   return write_addiu (0x9, output, args, num_args); 
-    else if (strcmp(name, "ori") == 0)   return write_ori (0xd, output, args, num_args); 
+    else if (strcmp(name, "ori") == 0)   return write_ori (0xD, output, args, num_args); 
     else if (strcmp(name, "lui") == 0)   return write_lui (0xf, output, args, num_args);
     else if (strcmp(name, "lb") == 0)   return write_mem (0x20, output, args, num_args);
     else if (strcmp(name, "lbu") == 0)   return write_mem (0x24, output, args, num_args);
@@ -459,7 +459,7 @@ int write_jr(uint8_t funct, FILE* output, char** args, size_t num_args) {
 
 int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     // Perhaps perform some error checking?
-    if (num_args != 2) {
+    if (num_args != 3) {
         return -1;
     }    
     long int imm;
@@ -470,6 +470,8 @@ int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     if (err != -1) {
         uint32_t instruction = 0;
         // ORDER: opcode, rs, rt, imm
+        uint32_t mask = 0x0000ffff; // for removing leading 1's
+        imm &= mask;
         instruction += imm;
         instruction += (rt << 16);
         instruction += (rs << 21);
@@ -495,7 +497,7 @@ int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args) {
         instruction += imm;
         instruction += (rt << 16);
         instruction += (rs << 21);
-        instruction += (opcode << 27);
+        instruction += (opcode << 26);
         write_inst_hex(output, instruction);
         return 0;
     }
@@ -560,30 +562,25 @@ int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, uin
     if (num_args != 3) {
         return -1;
     }
-    // Check if label is valid
     int rs = translate_reg(args[0]);
     int rt = translate_reg(args[1]);
     int label_addr = get_addr_for_symbol(symtbl, args[2]);
     // Need to check if can_branch_to and if offset fits inside the immediate field
-    long int imm;
-    int err = translate_num(&imm, args[2], 0, UINT16_MAX);
-
-    if (err != -1) {
-        // assuming that addr is the PC address
-        // Check if branch offset fits inside immediate field
-        if (!can_branch_to(addr, label_addr) || ((imm << 16) >> 16 != imm)) {
-            return -1;
-        }
-        int32_t offset = (label_addr - (addr + 4)) / 4;
-        uint32_t instruction = 0;
-        // ORDER: opcode, rs, rt, offset
-        instruction += offset;
-        instruction += (rt << 16);
-        instruction += (rs << 21);
-        write_inst_hex(output, instruction);        
-        return 0;
+    // assuming that addr is the PC address
+    // Check if branch offset fits inside immediate field
+    if (!can_branch_to(addr, label_addr) || ((label_addr << 16) >> 16 != label_addr)) {
+        return -1;
     }
-    else { return -1; }
+    int32_t offset = (int32_t)(label_addr - (addr + 4)) / 4;
+    uint32_t mask = 0x0000ffff;
+    offset &= mask;
+    uint32_t instruction = 0;
+    instruction += offset;
+    instruction += (rt << 16);
+    instruction += (rs << 21);
+    instruction += (opcode << 26);
+    write_inst_hex(output, instruction);
+    return 0;
 }
 
 int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, uint32_t addr, SymbolTable* reltbl) {
@@ -593,12 +590,14 @@ int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, uint3
     // Need absolute address of the label to jump to
     int label_addr = get_addr_for_symbol(reltbl, args[0]);
     if (label_addr == -1) {
-        // if no address is found, set the address to 0 and
+        // if no address is found, set the address to 0
         label_addr = 0;
     }
-    add_to_table(reltbl, args[0], label_addr);
+    add_to_table(reltbl, args[0], addr);
     uint32_t instruction = 0;
     // ORDER: opcode, addr
+    uint32_t mask = 0x03ffffff;
+    label_addr &= mask;
     instruction += label_addr;
     instruction += (opcode << 26);
     write_inst_hex(output, instruction);
