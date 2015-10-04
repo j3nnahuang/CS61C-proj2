@@ -153,19 +153,30 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
         // Scan for the instruction name
     	char* token = strtok(buf, IGNORE_CHARS);
 
+        // If first token is a label, take the next token as the instruction name
+        if (add_if_label(input_line, token, byte_offset, symtbl)) {
+           token = strtok(NULL, INGORE_CHARS);   
+        }
+
         // Scan for arguments
         char* args[MAX_ARGS];
         int num_args = 0;
-
-    	// Checks to see if there were any errors when writing instructions
-        unsigned int lines_written = write_pass_one(output, token, args, num_args);
-        if (lines_written == 0) {
-            raise_inst_error(input_line, token, args, num_args);
-            ret_code = -1;
-        } 
-        byte_offset += lines_written * 4;
+ 
+        int parser =  parse_args(line_num, args, num_args);
+        if(!parser) {
+            if(!args) {
+    	        // Checks to see if there were any errors when writing instructions
+                unsigned int lines_written = write_pass_one(output, token, args, num_args);
+                if (lines_written == 0) {
+                    raise_inst_error(input_line, token, args, num_args);
+                    ret_code = -1;
+                } 
+                byte_offset += lines_written * 4;
+             }
+        }        
+        else { ret_code = -1; }
     }       
-    return -1;
+    return ret_code;
 }
 
 /* Reads an intermediate file and translates it into machine code. You may assume:
@@ -184,7 +195,7 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
        GET CLOBBERED. */
     char buf[BUF_SIZE];
     // Store input line number / byte offset below. When should each be incremented?
-    int line_num = 1;
+    int line_num = 0;
     int byte_offset = 0; 
     int has_error = 0; 
 
@@ -192,6 +203,7 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
     while (fgets(buf, sizeof(buf), input)) {
         // Next, use strtok() to scan for next character. If there's nothing,
         // go to the next line.
+        line_num++;
         char* name;
         if (!(name = strtok(buf, IGNORE_CHARS)) == NULL) {
             // Parse for instruction arguments. You should use strtok() to tokenize
@@ -215,10 +227,8 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
             has_error = has_error + inst; 
 
             // Repeat until no more characters are left, and the return the correct return val
-            byte_offset++;
+            byte_offset += 4;
         }
-
-        line_num++;
 
 
     }
