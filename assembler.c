@@ -184,24 +184,49 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
        GET CLOBBERED. */
     char buf[BUF_SIZE];
     // Store input line number / byte offset below. When should each be incremented?
+    int line_num = 1;
+    int byte_offset = 0; 
+    int has_error = 0; 
 
     // First, read the next line into a buffer.
+    while (fgets(buf, sizeof(buf), input)) {
+        // Next, use strtok() to scan for next character. If there's nothing,
+        // go to the next line.
+        char* name;
+        if (!(name = strtok(buf, IGNORE_CHARS)) == NULL) {
+            // Parse for instruction arguments. You should use strtok() to tokenize
+            // the rest of the line. Extra arguments should be filtered out in pass_one(),
+            // so you don't need to worry about that here.
+            char* args[MAX_ARGS];
+            int num_args = 0;
 
-    // Next, use strtok() to scan for next character. If there's nothing,
-    // go to the next line.
+            int parser = parse_args(line_num, args, num_args);
+            has_error = has_error + parser; // Parser returns -1 if error. 
 
-    // Parse for instruction arguments. You should use strtok() to tokenize
-    // the rest of the line. Extra arguments should be filtered out in pass_one(),
-    // so you don't need to worry about that here.
-    char* args[MAX_ARGS];
-    int num_args = 0;
+            // Use translate_inst() to translate the instruction and write to output file.
+            // If an error occurs, the instruction will not be written and you should call
+            // raise_inst_error(). 
+            int inst = translate_inst(output, name, args, num_args, byte_offset, symtbl, reltbl);
 
-    // Use translate_inst() to translate the instruction and write to output file.
-    // If an error occurs, the instruction will not be written and you should call
-    // raise_inst_error(). 
+            if (inst == -1) {
+                raise_inst_error(line_num, name, args, num_args);
+            }
 
-    // Repeat until no more characters are left, and the return the correct return val
+            has_error = has_error + inst; 
 
+            // Repeat until no more characters are left, and the return the correct return val
+            byte_offset++;
+        }
+
+        line_num++;
+
+
+    }
+
+    
+    if (!has_error) {
+        return 0;
+    }
     return -1;
 }
 
