@@ -44,10 +44,8 @@ void write_symbol(FILE* output, uint32_t addr, const char* name) {
    to store this value for use during add_to_table().
  */
 SymbolTable* create_table(int mode) {
-    /* YOUR CODE HERE */
-    // So SymbolTable's tbl field = an ARRAY of Symbols. 
 
-    // Thank goodness for lab02. 
+    // SymbolTable's tbl field = array of Symbols. 
     SymbolTable* table_pointer;
 
     /* First allocate memory for the struct. */
@@ -61,7 +59,7 @@ SymbolTable* create_table(int mode) {
     /* Initialize all the fields. */
     table_pointer->tbl = malloc(INITIAL_SIZE * sizeof(Symbol)); 
 
-    /* Check return value of Symbol ARRAY to make sure we got memory. */
+    /* Check return value of symbol array to make sure got memory. */
     if (table_pointer->tbl == NULL) {
       free(table_pointer);
       allocation_failed();
@@ -70,30 +68,19 @@ SymbolTable* create_table(int mode) {
     table_pointer->len = 0;
     table_pointer->cap = INITIAL_SIZE; 
     table_pointer->mode = mode; 
-    // Wow that's confusing. Mode field of SymbolTable = what was passed in. 
 
     return table_pointer; 
 }
 
 /* Frees the given SymbolTable and all associated memory. */
 void free_table(SymbolTable* table) {
-    /* YOUR CODE HERE */
-    // Okay gotta free the array of Symbols, the Symbols in the array, and then the Symbol Table itself. 
-    // According to lab2, don't have to free the pointer to the table though, because on the stack, so will get freed. 
+    // Free the array of Symbols and the Symbol Table itself. 
+    // Don't need to free the Symbols in the array b/c weren't malloced.
 
-
-    // Ok I think don't need to free the Symbols in the array, b/c weren't malloced. 
-    // Malloc - array would be an array of pointers to Symbols. 
-    // But it's only got 1 star. 
-    // So I'm assuming no malloc. 
-    // So don't need to free the Symbols themselves inside the array. 
-
-    // Free array of Symbols. 
     free(table->tbl);
-
-    // Free symbol table itself. 
     free(table);
 }
+
 
 /* A suggested helper function for copying the contents of a string. */
 static char* create_copy_of_str(const char* str) {
@@ -121,9 +108,7 @@ static char* create_copy_of_str(const char* str) {
    Otherwise, you should store the symbol name and address and return 0.
  */
 int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
-    /* YOUR CODE HERE */
 
-    // WORD-ALIGNMENT
     // Word alignment, just divisible by 4. 
     if (addr % 4) {
       addr_alignment_incorrect();
@@ -140,11 +125,8 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
     int table_length = table->len;
     int table_cap = table->cap;
     if (table_length >= table_cap) {
-      // Realloc supes nice. 
-      // Moves pointer AND content for you if it moved it.
-      // Also auto frees old block if moved. 
+
       table->tbl = realloc(table->tbl, table_length * SCALING_FACTOR * sizeof(Symbol));
-      // Realloc does bytes. 
 
       // Make sure memory allocation succeeded
       if (table -> tbl == NULL) {
@@ -156,34 +138,30 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
       table -> cap = table_cap * SCALING_FACTOR; 
     }
 
-    // Now just store the symbol name and address and return 0. 
-    // All errors should be taken care of. 
+    // Store the symbol name and address and return 0.
     Symbol new_entry; 
     new_entry.name = create_copy_of_str(name);
     new_entry.addr = addr;
     (table -> tbl)[table_length] = new_entry;
 
-    // INCREMENT LEN
+    // Increment len
     table -> len = table_length + 1; 
 
     return 0;
 }
 
+
 /* Returns the address (byte offset) of the given symbol. If a symbol with name
    NAME is not present in TABLE, return -1.
  */
 int64_t get_addr_for_symbol(SymbolTable* table, const char* name) {
-    /* YOUR CODE HERE */
-    // Okay hopefully lab02 is good way to go.
+
     if (table != NULL) {
         // Looking for the name
-	     // I think have to loop through the entire array to check if name.
        int i = 0;
 	     int array_size = table->len; 
-	     // Hopefully will give me size of the array. 
         while (i < array_size) {
    	      if (!strcmp(name, table->tbl[i].name)) {
-	           // Yes we've found the one. 
 	           return table->tbl[i].addr;
  	        }
 	        i++; 
@@ -192,24 +170,17 @@ int64_t get_addr_for_symbol(SymbolTable* table, const char* name) {
     return -1;
 }
 
-// HEY ALICE LISTEN TO THIS
-// All the test_tables tests passed before I even wrote write_table. 
-// So make sure to write a test for this.
-// You hear me WRITE A TEST FOR WRITE_TABLE 
-
 
 
 /* Writes the SymbolTable TABLE to OUTPUT. You should use write_symbol() to
    perform the write. Do not print any additional whitespace or characters.
  */
 void write_table(SymbolTable* table, FILE* output) {
-    /* YOUR CODE HERE */
-    // So...I guess I'm just going through all the entries and printing them. 
+    // Go through all the entries and print them. 
     if (table != NULL) {
       int i = 0;
       int array_size = table -> len;
       while (i < array_size) {
-        // Print yourself. 
         write_symbol(output, (table -> tbl)[i].addr, (table -> tbl)[i].name);
 
         i++; 
