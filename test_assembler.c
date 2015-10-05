@@ -416,28 +416,28 @@ int main(int argc, char** argv) {
     }
 
     /* Suite 1 */
-   // pSuite1 = CU_add_suite("Testing translate_utils.c", NULL, NULL);
-   // if (!pSuite1) {
-     //   goto exit;
-   // }
-   // if (!CU_add_test(pSuite1, "test_translate_reg", test_translate_reg)) {
-   //     goto exit;
-   // }
-   // if (!CU_add_test(pSuite1, "test_translate_num", test_translate_num)) {
-   //     goto exit;
-   // }
+    pSuite1 = CU_add_suite("Testing translate_utils.c", NULL, NULL);
+    if (!pSuite1) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite1, "test_translate_reg", test_translate_reg)) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite1, "test_translate_num", test_translate_num)) {
+        goto exit;
+    }
 
     /* Suite 2 */
-   // pSuite2 = CU_add_suite("Testing tables.c", init_log_file, NULL);
-   // if (!pSuite2) {
-   //     goto exit;
-   // }
-   // if (!CU_add_test(pSuite2, "test_table_1", test_table_1)) {
-      //  goto exit;
-    //}
-   // if (!CU_add_test(pSuite2, "test_table_2", test_table_2)) {
-     //   goto exit;
-   // }
+    pSuite2 = CU_add_suite("Testing tables.c", init_log_file, NULL);
+    if (!pSuite2) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite2, "test_table_1", test_table_1)) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite2, "test_table_2", test_table_2)) {
+        goto exit;
+    }
 
     /* Suite 3 */
     pSuite3 = CU_add_suite("Testing translate.c", NULL, NULL);
