@@ -388,16 +388,28 @@ void test_jal() {
     int result = translate_inst(file, name, args, num_args, addr, symtbl, reltbl);
     CU_ASSERT_EQUAL(result, 0);
 
-    int rel_addr = get_addr_for_symbol(reltbl, "label");
-    printf("%d\n", rel_addr);
-    CU_ASSERT_EQUAL(rel_addr, 12);
-    
+    fclose(file);
+}
+
+void test_li() {
+    FILE *file = fopen(TMP_FILE, "a");
+
+    char* name = "li";
+    char* args[2];
+    args[0] = "$v0";
+    args[1] = "26";
+    size_t num_args = 2;
+
+    int result = write_pass_one(file, name, args, num_args);
+    CU_ASSERT_EQUAL(result, 1);
+
     fclose(file);
 }
 
 
+
 int main(int argc, char** argv) {
-    CU_pSuite pSuite1 = NULL, pSuite2 = NULL, pSuite3 = NULL;
+    CU_pSuite pSuite1 = NULL, pSuite2 = NULL, pSuite3 = NULL, pSuite4 = NULL;
 
     if (CUE_SUCCESS != CU_initialize_registry()) {
         return CU_get_error();
@@ -463,6 +475,14 @@ int main(int argc, char** argv) {
         goto exit;
     }
 
+    /* Suite 4*/
+    pSuite4 = CU_add_suite("Testing pseudoexpansions", NULL, NULL);
+    if (!pSuite4) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite4, "test_li", test_li)) {
+        goto exit;
+    }
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();

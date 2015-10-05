@@ -70,18 +70,18 @@ int li_expansion(char** args, FILE* output) {
     //sdfsdfsdfchar* end; 
     //long int imm = strtol(args[1], &end, 0);
     int failure;
-    long int* imm_pointer; 
-    failure = translate_num(imm_pointer, args[1], INT32_MIN, UINT32_MAX);
+    long int imm_pointer; 
+    failure = translate_num(&imm_pointer, args[1], INT32_MIN, UINT32_MAX);
     if (failure) {
       return 0; 
     }
 
     int num_instruct = 0;  
-    if ((*imm_pointer) >= INT16_MIN && (*imm_pointer) <= UINT16_MAX) {
+    if ((imm_pointer) >= INT16_MIN && (imm_pointer) <= UINT16_MAX) {
       // Make addiu instruction. 
       // addiu $dest $base value 
       // failure = write_addiu(9, output, args, num_args);
-      fprintf(output, "addiu %s, $0, %li\n", args[0], *imm_pointer);
+      fprintf(output, "addiu %s, $0, %li\n", args[0], imm_pointer);
       num_instruct++;
 
       // if (!failure) {
@@ -96,14 +96,18 @@ int li_expansion(char** args, FILE* output) {
 
       //failure = write_lui(15, output, args, num_args);
       // Want first 16 bits = logical shift 
-      int lui_int = (*imm_pointer) >> 16; 
+      int lui_int = (imm_pointer) >> 16;
+      uint32_t mask = 0x0000ffff; // for removing leading     1's
+      lui_int &= mask; 
       fprintf(output, "lui $at, %i\n", lui_int);
       num_instruct++;
 
       // Okay should be fine; shifting won't change the original value. 
       //failure = write_ori(13, output, args, num_args);
-      int ori_int = (*imm_pointer) << 16; 
-      fprintf(output, "ori $at, $at, %i\n", ori_int);
+      int ori_int = ((imm_pointer) << 16) >> 16;
+      //uint32_t mask = 0x0000ffff; // for removing leading 1's
+      ori_int &= mask; 
+      fprintf(output, "ori %s, $at, %i\n", args[0], ori_int);
       num_instruct++;
       // if (!failure) {
       //     num_instruct++;
@@ -538,6 +542,8 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     if (err != -1) {
         uint32_t instruction = 0;
         // ORDER: opcode, rs, rt, imm
+        uint32_t mask = 0x0000ffff; // for removing leading 1's
+        imm &= mask;
         instruction += imm;
         instruction += (rt << 16);
         instruction += (rs << 21);
@@ -587,12 +593,13 @@ int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, uint3
     if (num_args != 1) {
         return -1;
     }
+    int label_addr;
     // Need absolute address of the label to jump to
-    int label_addr = get_addr_for_symbol(reltbl, args[0]);
-    if (label_addr == -1) {
+    //label_addr = get_addr_for_symbol(reltbl, args[0]);
+    //if (label_addr == -1) {
         // if no address is found, set the address to 0
         label_addr = 0;
-    }
+    //}
     add_to_table(reltbl, args[0], addr);
     uint32_t instruction = 0;
     // ORDER: opcode, addr
