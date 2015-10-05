@@ -137,68 +137,52 @@ static int parse_args(uint32_t input_line, char** args, int* num_args) {
    it should return 0.
  */
 int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
-    /* YOUR CODE HERE */
-    //fprintf(output "In pass one");
-//    printf("I am in pass_one!!\n");
     char buf[BUF_SIZE];
     uint32_t input_line = 0, byte_offset = 0;
     int ret_code = 0;
 
-
      // Read lines and add to instructions
     while(!feof(input)) {
-        //fprintf(output, "!feof line 150");
         input_line++;
         fgets(buf, BUF_SIZE, input);
-        //fprintf(output, "fgets(buf) line 153");
-  //      printf("In while loop\n");
+        
         // Ignore comments
         skip_comment(buf);
-    //    printf("Finished skipping comments\n");
 
         // Scan for the instruction name
     	char* token = strtok(buf, IGNORE_CHARS);
         int post_label = 0;
-      //  printf("Grabbed first token: %s\n", token);
+        
+        // If line is not empty
         if (token) {
-        // If first token is a label, take the next token as the instruction name
-        if (add_if_label(input_line, token, byte_offset, symtbl)) {
-           //fprintf(output, "add_if_label line 165");
-           token = strtok(NULL, IGNORE_CHARS);
-           if (token) {  post_label = 1; }
-        //  printf("First token was label - took next token as instruction name\n");   
-        }
+            // If first token is a label, take the next token as the instruction name
+            if (add_if_label(input_line, token, byte_offset, symtbl)) {
+                token = strtok(NULL, IGNORE_CHARS);
+                if (token) { // If token is not null, there is an instruction after the label
+                    post_label = 1;
+                }
+            }
 
-        // Scan for arguments
-        char* args[MAX_ARGS];
-        int num_args = 0;
+            // Scan for arguments
+            char* args[MAX_ARGS];
+            int num_args = 0;
  
-        int parser =  parse_args(input_line, args, &num_args);
-        //fprintf(output, "parsed args line 175");
-       // printf("Parsed for args\n");
-        if(!parser) {
-              //fprintf(output, "!parser line 178");
-         //   printf("!parser\n");
-            if(num_args || post_label) {
-                  //fprintf(output, "num_args line 181");
-           //    printf("!num_args\n");
-    	        // Checks to see if there were any errors when writing instructions
-                unsigned int lines_written = write_pass_one(output, token, args, num_args);
-                if (lines_written == 0) {
-                     //fprintf(output, "lines_written = 0 line 186");
-             //       printf("lines_written = 0; line 179\n");
-                    raise_inst_error(input_line, token, args, num_args);
-                    ret_code = -1;
-                } 
-                byte_offset += lines_written * 4;
-             }
-        }        
-        else {
-           //fprintf(output, "else line 195");
-           // printf("Else - line 187\n"); 
-            ret_code = -1;
-         }
-    } // end of if
+            int parser =  parse_args(input_line, args, &num_args);
+            if(!parser) {
+                if(num_args || post_label) {
+    	            // Checks to see if there were any errors when writing instructions
+                    unsigned int lines_written = write_pass_one(output, token, args, num_args);
+                    if (lines_written == 0) {
+                        raise_inst_error(input_line, token, args, num_args);
+                        ret_code = -1;
+                    } 
+                    byte_offset += lines_written * 4;
+                 }
+            }        
+            else {
+                ret_code = -1;
+            }
+        }
     }       
     return ret_code;
 }
@@ -213,7 +197,6 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
    If an error is reached, DO NOT EXIT the function. Keep translating the rest of
    the document, and at the end, return -1. Return 0 if no errors were encountered. */
 int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl) {
-    /* YOUR CODE HERE */
 
     /* Since we pass this buffer to strtok(), the characters in this buffer will
        GET CLOBBERED. */

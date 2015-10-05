@@ -60,6 +60,7 @@ int translate_num(long int* output, const char* str, long int lower_bound,
     }
     char* end;
     long int temp = strtol(str, &end, 0);
+    // Check that str does not contain extra non-number characters and that its integer representation fits in the given bounds
     if (*end == '\0' && temp >= lower_bound && temp <= upper_bound) {
         *output = temp;
         return 0;
