@@ -403,6 +403,10 @@ int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
     int rs = translate_reg(args[1]);
     int rt = translate_reg(args[2]);
 
+    if (rd == -1 || rs == -1 || rt == -1) {
+        return -1;
+    }
+
     uint32_t instruction = 0;
     // Combine rd, rs, and rt into binary representation, then use write_inst_hex to translate to hex
     // ORDER: opcode=0, rs, rt, rd, shamt=0, func
@@ -432,7 +436,7 @@ int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args) {
     int err = translate_num(&shamt, args[2], 0, 31);
 
     // Only continue if translate_num doesn't result in an error
-    if (err != -1) {
+    if (err != -1 && rd != -1 && rt != -1) {
         uint32_t instruction = 0;
         // ORDER: opcode=0, rs=unused, rt, rd, shamt, funct
         instruction += funct;
@@ -453,6 +457,9 @@ int write_jr(uint8_t funct, FILE* output, char** args, size_t num_args) {
         return -1;
     }
     int rs = translate_reg(args[0]);
+    if (rs == -1) {
+        return -1;
+    }
     // ORDER: opcode=0, rs, rt=0, rd=0, shamt=0, funct
     uint32_t instruction = 0;
     instruction += funct;
@@ -471,7 +478,7 @@ int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     int rs = translate_reg(args[1]);
     // need clarification on addiu - what does it mean to pass in a negative immediate?
     int err = translate_num(&imm, args[2], INT16_MIN, INT16_MAX);
-    if (err != -1) {
+    if (err != -1 && rs != -1 && rt != -1) {
         uint32_t instruction = 0;
         // ORDER: opcode, rs, rt, imm
         uint32_t mask = 0x0000ffff; // for removing leading 1's
@@ -495,7 +502,7 @@ int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     int rt = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
     int err = translate_num(&imm, args[2], 0, UINT16_MAX);
-    if (err != -1) {
+    if (err != -1 && rs != -1 && rt != -1) {
         uint32_t instruction = 0;
         // ORDER: opcode, rs, rt, imm
         instruction += imm;
@@ -517,7 +524,7 @@ int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     int rt = translate_reg(args[0]);
     int err = translate_num(&imm, args[1], 0, UINT16_MAX);
 
-    if (err != -1) {
+    if (err != -1 && rt != -1) {
         uint32_t instruction = 0;
         // ORDER: opcode, rs=0, rt, imm
         instruction += imm;
@@ -539,7 +546,7 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     int rs = translate_reg(args[2]);
     int err = translate_num(&imm, args[1], INT16_MIN, INT16_MAX);
 
-    if (err != -1) {
+    if (err != -1 && rs != -1 && rt != -1) {
         uint32_t instruction = 0;
         // ORDER: opcode, rs, rt, imm
         uint32_t mask = 0x0000ffff; // for removing leading 1's
@@ -574,7 +581,7 @@ int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, uin
     // Need to check if can_branch_to and if offset fits inside the immediate field
     // assuming that addr is the PC address
     // Check if branch offset fits inside immediate field
-    if (!can_branch_to(addr, label_addr) || ((label_addr << 16) >> 16 != label_addr)) {
+    if (label_addr == -1 || rs == -1 || rt == -1 || !can_branch_to(addr, label_addr) || ((label_addr << 16) >> 16 != label_addr)) {
         return -1;
     }
     int32_t offset = (int32_t)(label_addr - (addr + 4)) / 4;

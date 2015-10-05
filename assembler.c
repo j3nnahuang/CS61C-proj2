@@ -158,12 +158,14 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
 
         // Scan for the instruction name
     	char* token = strtok(buf, IGNORE_CHARS);
+        int post_label = 0;
       //  printf("Grabbed first token: %s\n", token);
         if (token) {
         // If first token is a label, take the next token as the instruction name
         if (add_if_label(input_line, token, byte_offset, symtbl)) {
            //fprintf(output, "add_if_label line 165");
            token = strtok(NULL, IGNORE_CHARS);
+           if (token) {  post_label = 1; }
         //  printf("First token was label - took next token as instruction name\n");   
         }
 
@@ -177,7 +179,7 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
         if(!parser) {
               //fprintf(output, "!parser line 178");
          //   printf("!parser\n");
-            if(num_args) {
+            if(num_args || post_label) {
                   //fprintf(output, "num_args line 181");
            //    printf("!num_args\n");
     	        // Checks to see if there were any errors when writing instructions
