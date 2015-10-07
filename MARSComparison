@@ -1,0 +1,7 @@
+label: 
+	addiu $0, $0, 0
+	
+	
+addiu $0 $0 0
+jal label
+
