@@ -49,6 +49,22 @@
 #------------------------------------------------------------------------------
 addr_for_symbol:
         # YOUR CODE HERE
+       	# Begin addr_for_symbol
+       	
+       	# First check if pointer is null - empty list. 
+       	beq $a0, $0, addr_not_found
+       	# Else, start checking out symbols. 
+       	# I guess just check the addresses, because can't like load in a string. 
+       	lw $t0, 0($a0) # $t0 holds curr name. 
+       	beq $t0, $a1, addr_found 
+       	
+addr_found:
+	# Grab the address of the current node. 
+	lw $v0, 
+       	
+       	
+addr_not_found: 
+	li $v0, -1
         jr $ra
         
 #------------------------------------------------------------------------------
@@ -96,7 +112,7 @@ symbol_for_addr:
         lw $a0, 8($a0)
         j symbol_for_addr
 symbol_found:
-        lw $v0, 4($a0)
+        lw $v0, 0($a0)
         jr $ra
 symbol_not_found:
         li $v0, 0
