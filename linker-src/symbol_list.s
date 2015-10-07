@@ -57,15 +57,18 @@ addr_for_symbol:
        	# I guess just check the addresses, because can't like load in a string. 
        	lw $t0, 0($a0) # $t0 holds curr name. 
        	beq $t0, $a1, addr_found 
+       	# If not the right one, then load in next node and try again. 
+       	lw $a0, 8($a0)
+       	j addr_for_symbol
        	
 addr_found:
 	# Grab the address of the current node. 
-	lw $v0, 
-       	
+	lw $v0, 4($a0) 
+	jr $ra
        	
 addr_not_found: 
 	li $v0, -1
-        jr $ra
+        jr $ra			# End addr_for_symbol
         
 #------------------------------------------------------------------------------
 # function add_to_list()
