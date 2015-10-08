@@ -27,13 +27,15 @@ tab:	.asciiz "\t"
 # Returns: the length of the string
 #------------------------------------------------------------------------------
 strlen:
-	add $v0, $0, $0		# initialize length to 0 in $v0
-	loop:
-	lb $t0, 0($a0)		# store first char in $t0
+	add $v0, $0, $0		# initialize length to 0
+
+	count:
+	lb $t0, 0($a0)		# load next char
 	beqz $t0, exit		# exit if null character
 	addiu $v0, $v0, 1	# increment length by 1
 	addiu $a0, $a0, 1	# point to next char in string
-	j loop 				# loop again
+	j count 			# loop again
+
 	exit:
 	jr $ra
 
@@ -48,7 +50,33 @@ strlen:
 # Returns: the destination array
 #------------------------------------------------------------------------------
 strncpy:
-	# YOUR CODE HERE
+	add $t0, $0, $0		# initialize counter to 0
+	addi $sp, $sp, -2
+	sb $a0, 0($sp)		# store pointer to dest array in stack
+	sb $a1, 1($sp)		# store pointer to src string in stack
+
+	copy:
+	lb $t1, 0($a1)		# load next char from src string
+	beq $t0, $a2, finish	# exit if reached num of chars to copy
+	beqz $a1, pad		# pad with 0s if end of src reached before num
+	lb $a0, 0($a1)		# load corresponding char from src into dest
+	addiu $a0, $a0, 1	# point to next char in dest
+	addiu $a1, $a1, 1	# point to next char in src
+	addiu $t0, $t0, 1	# increment counter by 1
+	j copy 				# loop again
+
+	pad:
+	lb $t0, 0($a0)		# load next space in dest array
+	lb $t0, 0($zero)	# store 0
+	addiu $a0, $a0, 1	# point to next char in dest
+	addiu $t0, $t0, 1	# increment counter by 1
+	beq $t0, $a2, finish	# exit if reached num of chars to copy
+
+	finish:
+	lb $a1, 1($sp)
+	lb $a0, 0($sp)
+	addi $sp, $sp, 1
+	add $v0, $a0, $0
 	jr $ra
 
 #------------------------------------------------------------------------------
