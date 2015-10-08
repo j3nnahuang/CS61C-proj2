@@ -27,7 +27,14 @@ tab:	.asciiz "\t"
 # Returns: the length of the string
 #------------------------------------------------------------------------------
 strlen:
-	# YOUR CODE HERE
+	add $v0, $0, $0		# initialize length to 0 in $v0
+	lb $t0, 0($a0)		# store first char in $t0
+	loop:
+	bnez $t0, exit		# exit if null character
+	addiu $v0, $v0, 1	# increment length by 1
+	addiu $t0, $t0, 1	# point to next char in string
+	j loop # loop again
+	exit:
 	jr $ra
 
 #------------------------------------------------------------------------------
