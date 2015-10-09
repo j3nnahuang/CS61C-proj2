@@ -90,7 +90,63 @@ addr_not_found:
 #------------------------------------------------------------------------------
 add_to_list:    
         # YOUR CODE HERE
+        # Begin fxn add_to_list
+        
+        # List just has pointer to next - use $a0 as next. 
+        
+        # First create new node. 
+        # Gotta call another fxn - save the args and $ra. AND S IF NEED SOME??? 
+        
+        # Prologue
+        addiu $sp $sp -20 
+        sw $ra 0($sp)
+        sw $a0 4($sp)
+        sw $a1 8($sp)
+        sw $a2 12($sp)
+        sw $s0 16($sp)
+        
+        # Create new node. 
+        jal new_node
+        
+        # So now $v0 contains the pointer to new node. 
+        # Move new node pointer into $s0. 
+	addu $s0 $v0 $0 
+	
+	# Now copy string - call the fxn. 
+	# Don't forget put string to copy into $a0.
+	lw $a1 8($sp) 
+	addu $a0 $a1 $0 
+	jal copy_of_str
+	
+	# So now $v0 should contain pointer to string copy. 
+	
+	# Now just stick stuff into node, and put to front, and return. 
+	
+	# Stick stuff into node. 
+	sw $v0 0($s0) # Name 
+	lw $a2 12($sp) 
+	sw $a2 4($s0) # Addr
+	lw $a0 4($sp) 
+	sw $a0 8($s0) # Next
+	
+	# Return the new node front. 
+	addu $v0 $s0 $0 
+	
+	
+	# EPILOGUE
+	lw $ra 0($sp)
+	lw $a0 4($sp) 
+	lw $a1 8($sp)
+	lw $a2 12($sp)
+	lw $s0 16($sp)
+	addiu $sp $sp 20 
+     
         jr $ra
+        
+        # End fxn add_to_list
+        
+
+	
 
 ###############################################################################
 #                 DO NOT MODIFY ANYTHING BELOW THIS POINT                       
