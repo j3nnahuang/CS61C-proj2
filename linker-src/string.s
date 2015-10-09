@@ -93,7 +93,26 @@ strncpy:
 # Returns: pointer to the copy of the string
 #------------------------------------------------------------------------------
 copy_of_str:
-	# YOUR CODE HERE
+
+	addi $sp, $sp, -4	# move stack pointer to store saved register in stack
+	sw $ra, 0($sp)
+
+	move $s1, $a0		# store source string in $s1		
+	jal strlen
+	move $s2, $v0		# load string length into $s2
+
+	li $v0, 9			# load syscall # and allocate space for  string	
+	move $a0, $s2
+	syscall
+
+
+	move $a0, $v0		# store address of allocated memory in $a0 in prep for calling strncpy
+	move $a1, $s1
+	move $a2, $s2
+	jal strncpy			# copies string into allocated memory and returns pointer to it
+
+	lw $ra, 0($sp)		# load back return address reg and move stack pointer back
+	addiu $sp, $sp, 4
 	jr $ra
 
 ###############################################################################

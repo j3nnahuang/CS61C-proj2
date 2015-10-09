@@ -34,8 +34,8 @@ main:
 	print_newline()
 	jal test_strncpy
 	
-	#print_newline()
-	#jal test_copy_of_str
+	print_newline()
+	jal test_copy_of_str
 	
 	li $v0, 10
 	syscall
