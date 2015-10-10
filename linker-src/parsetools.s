@@ -36,7 +36,53 @@
 # Returns: none
 #------------------------------------------------------------------------------
 hex_to_str:
-	# YOUR CODE HERE
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+		
+	addiu $t3, $0, 9
+	addiu $t4, $0, 15
+	add $t5, $0, $0		# initialize counter to 0
+	addiu $t6, $0, 4	# initialize max num of loops to 4 (4 * 2 = 8 digits)
+
+	load_and_loop:	
+	beq $t5, $t6, complete
+	move $t0, $a0		# load byte into $t0
+	srl $t1, $t0, 4		# load upper 4 bits into $t1
+	jal convert 		# convert upper 4 bits from hex to char
+
+	sll $t1, $t0, 4		# load lower 4 bits into $t1
+	srl $t1, $t2, 4	
+	jal convert 		# convert lower 4 bits from hex to char
+
+	addiu $t5, $t5, 1	# increment counter	
+	j load_and_loop
+
+	complete:
+	addiu $t1, $0, 92 	# '|'
+	sb $t1, 0($a1)		# store char in buffer
+	addiu $a1, $a1, 1	# move pointer to next space in buffer
+	addiu $t1, $0, 110	# 'n'
+	sb $t1, 0($a1)		# store char in buffer
+	addiu $a1, $a1, 1	# move pointer to next space in buffer
+
+	lw $ra, 0($sp)
+	addiu $sp, $sp, 4
+	jr $ra
+
+convert:
+	ble $t1, $t3, num
+	ble $t1, $t4, letter
+
+	num:
+	addiu $t1, $t1, 48	# convert to ASCII decimal where '0' = 48	
+	sb $t1, 0($a1)		# store char in buffer
+	addiu $a1, $a1, 1	# move pointer to next space in buffer
+
+	letter:
+	addiu $t1, $t1, 87	# convert to ASCII decimal where 'a' = 97 (a in hex = 10)	
+	sb $t1, 0($a1)		# store char in buffer
+	addiu $a1, $a1, 1	# move pointer to next space in buffer
+
 	jr $ra
 
 ###############################################################################
