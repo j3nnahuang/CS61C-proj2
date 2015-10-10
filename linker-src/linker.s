@@ -48,6 +48,7 @@ hex_buffer:		.space 10
 write_machine_code:
 	# You may need to save additional items onto the stack. Feel free to
 	# change this part.
+	# ALICE DGUHDSLIGHDSLIGHDSLG CHECK YOUR STACK LDIFUGHDSILGHDLISUG
 	addiu $sp, $sp, -24
 	sw $s0, 20($sp)
 	sw $s1, 16($sp)
@@ -77,10 +78,13 @@ write_machine_code_find_text:
 	# 1. Initialize the byte offset to zero. We will need this for any instructions
 	# that require relocation:
 	# YOUR_INSTRUCTIONS_HERE
+	# Okay I'm not super sure what to do here, but... store the byte offset in $s4?
+	addu $s4 $0 $0
 
 write_machine_code_next_inst:
 	# 2. Call readline() while passing in the correct arguments:
 	# YOUR_INSTRUCTIONS_HERE
+	# WAS HERE DRLUTHDSRLIHSLDRU
 
 	# Check whether readline() returned an error.
 	blt $v0, $0, write_machine_code_error
