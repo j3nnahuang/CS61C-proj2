@@ -47,8 +47,8 @@ rel_tbl:		.word 24 test_label3 rel_2
 main:
 	print_str(test_header_name)
 	
-	print_newline()
-	jal test_inst_needs_relocation
+	#print_newline()
+	#jal test_inst_needs_relocation
 	
 	print_newline()
 	jal test_relocate_inst

@@ -46,7 +46,18 @@ relocLabel: .asciiz ".relocation"
 # Returns: 1 if the instruction needs relocation, 0 otherwise.
 #------------------------------------------------------------------------------
 inst_needs_relocation:
-        # YOUR CODE HERE
+        addiu $t0, $0, 0x2	# j instruction
+        addiu $t1, $0, 0x3	# jal instruction
+        move $t2, $a0
+        srl $t2, $t2, 26
+        andi $t2, $t2, 0x0000003f
+        beq $t2, $t0, needs_relocation
+        beq $t2, $t1, needs_relocation
+        add $v0, $0, $0
+        jr $ra
+        
+        needs_relocation:
+        addiu $v0, $0, 1
         jr $ra
         
 #------------------------------------------------------------------------------
@@ -68,7 +79,65 @@ inst_needs_relocation:
 # Returns: the relocated instruction, or -1 if error
 #------------------------------------------------------------------------------
 relocate_inst:
-        # YOUR CODE HERE
+        addi $sp, $sp, -36
+        sw $a0, 0($sp)
+        sw $a1, 4($sp)
+        sw $a2, 8($sp)
+        sw $a3, 12($sp)
+        sw $ra, 16($sp)
+        sw $s0, 20($sp)
+        sw $s1, 24($sp)
+        sw $s2, 28($sp)
+        sw $s3, 32($sp)
+        
+        addi $s0, $0, -1	# num representing error
+        
+        move $a0, $a3		# move relocation table to $a0 in prep for calling symbol_for_addr
+        jal symbol_for_addr
+        beq $v0, $s0, error
+        move $s1, $v0
+        
+        lw $a2, 8($sp)
+        
+        move $s1, $v0		# store label name of instruction in $t1
+        move $a0, $a2
+        move $a1, $s1        
+                
+        jal addr_for_symbol        
+        beq $v0, $s0, error
+        
+        move $s2, $v0		# store absolute address of instruction in $t2
+        
+        srl $s2, $s2, 2		# divide absolute address by 4 to get number of words
+        addiu $s3, $0, 0x0fffffff
+        and $s2, $s2, $s3
+        
+        lw $a0, 0($sp)
+        #lw $a1, 4($sp)
+        #lw $a2, 8($sp)
+        #lw $a3, 12($sp)
+        
+        srl $a0, $a0, 26	# shift right 26 bits and back again to get rid of previous address
+        sll $a0, $a0, 26
+        add $a0, $a0, $s2
+        j finish_relocation
+        
+        
+        error:        
+        lw $ra, 16($sp)
+        lw $s1, 24($sp)
+        lw $s2, 28($sp)
+        lw $s3, 32($sp)
+        addi $sp, $sp, 36
+        jr $ra
+        
+        finish_relocation:
+        move $v0, $a0
+        lw $ra, 16($sp)
+        lw $s1, 24($sp)
+        lw $s2, 28($sp)
+        lw $s3, 32($sp)
+        addi $sp, $sp, 36
         jr $ra
 
 ###############################################################################
