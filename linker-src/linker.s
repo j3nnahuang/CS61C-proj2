@@ -101,7 +101,7 @@ write_machine_code_next_inst:
 	# 3. Looks like there is another instruction. Call parse_int() with base=16
 	# to convert the instruction into a number, and store it into a register:
 	# YOUR_INSTRUCTIONS_HERE
-	addu $a0 $t0 $0 
+	addu $a0 $v1 $0 
 	addiu $a1 $0 16
 	jal parse_int
 	addu $s6 $v0 $0 # Instruction saved in $s6 
@@ -135,6 +135,7 @@ write_machine_code_to_file:
 	# 6. Write the instruction into a string buffer via hex_to_str():
 	# YOUR_INSTRUCTIONS_HERE 
 	addu $a0 $s6 $0 # Int to write
+	la $a1, hex_buffer
 	jal hex_to_str
 	
 	# 7. Increment the byte offset by the appropriate amount:

@@ -45,33 +45,32 @@ hex_to_str:
 	addiu $t6, $0, 32	# max num bits to the left of desired 4-bit section
 	addiu $t7, $0, 0x0000000f	# mask for getting 4 lowest bits
 
-	load_and_loop:	
+load_and_loop:	
 	beq $t5, $t6, complete
 	move $t0, $a0		# load byte into $t0
 	sllv $t1, $t0, $t5	# shift 4-bit section to upper 4 bits
 	srl $t1, $t1, 28	# shift 4-bit section to lower 4 bits
 	and $t1, $t1, $t7	# and with mask to get rid of leading zeros
-	jal convert 		# convert upper 4 bits from hex to char
 
-	convert:
+convert:
 	ble $t1, $t3, num
 	ble $t1, $t4, letter
 
-	num:
+num:
 	addiu $t1, $t1, 48	# convert to ASCII decimal where '0' = 48	
 	sb $t1, 0($a1)		# store char in buffer
 	addiu $a1, $a1, 1	# move pointer to next space in buffer
 	addiu $t5, $t5, 4	# increment by 4 to get next 4-bit section	
 	j load_and_loop
 
-	letter:
+letter:
 	addiu $t1, $t1, 87	# convert to ASCII decimal where 'a' = 97 (a in hex = 10)	
 	sb $t1, 0($a1)		# store char in buffer
 	addiu $a1, $a1, 1	# move pointer to next space in buffer
 	addiu $t5, $t5, 4	# increment by 4 to get next 4-bit section	
 	j load_and_loop
 
-	complete:
+complete:
 	addiu $t1, $0, 10	# newline char
 	sb $t1, 0($a1)		# store char in buffer
 	addiu $a1, $a1, 1	# move pointer to next space in buffer
