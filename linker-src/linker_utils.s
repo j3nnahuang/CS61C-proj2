@@ -113,9 +113,6 @@ relocate_inst:
         and $s2, $s2, $s3
         
         lw $a0, 0($sp)
-        #lw $a1, 4($sp)
-        #lw $a2, 8($sp)
-        #lw $a3, 12($sp)
         
         srl $a0, $a0, 26	# shift right 26 bits and back again to get rid of previous address
         sll $a0, $a0, 26
