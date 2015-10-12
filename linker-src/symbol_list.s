@@ -55,10 +55,11 @@ addr_for_symbol:
     sw $s1 8($sp)
     # sw $a0 4($sp)
    	# Begin addr_for_symbol
+    addu $s1 $a1 $0
    	
  looping_part:
  	addu $s0 $a0 $0 
- 	addu $s1 $a1 $0
+ 	
     #sw $a0 4($sp)
     #lw $a1 8($sp)
    	# First check if pointer is null - empty list. 
@@ -70,8 +71,8 @@ addr_for_symbol:
     addu $a0, $t0, $0 
     jal streq
     	addu $a0 $s0 $0
-    	addu $a1 $s1 $0
-    addu $a0 $s0 $0    
+    	#addu $a1 $s1 $0
+    #addu $a0 $s0 $0    
    	beq $v0, $0, addr_found 
    	# If not the right one, then load in next node and try again.
     # lw $a0, 4($sp)
