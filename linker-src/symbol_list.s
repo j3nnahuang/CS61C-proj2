@@ -48,27 +48,41 @@
 # Returns:  address of symbol if found or -1 if not found
 #------------------------------------------------------------------------------
 addr_for_symbol:
-        # YOUR CODE HERE
-       	# Begin addr_for_symbol
-       	
-       	# First check if pointer is null - empty list. 
-       	beq $a0, $0, addr_not_found
-       	# Else, start checking out symbols. 
-       	# I guess just check the addresses, because can't like load in a string. 
-       	lw $t0, 0($a0) # $t0 holds curr name. 
-       	beq $t0, $a1, addr_found 
-       	# If not the right one, then load in next node and try again. 
-       	lw $a0, 8($a0)
-       	j addr_for_symbol
+    # YOUR CODE HERE
+    addiu $sp $sp -8
+    sw $ra 0($sp)
+    sw $a0 4($sp)
+   	# Begin addr_for_symbol
+   	
+    lw $a0 4($sp)
+   	# First check if pointer is null - empty list. 
+   	beq $a0, $0, addr_not_found
+   	# Else, start checking out symbols. 
+   	# I guess just check the addresses, because can't like load in a string. 
+   	lw $t0, 0($a0) # $t0 holds curr name. 
+    # Check if strings are equal
+    addu $a0, $t0, $0 
+    jal streq
+   	beq $v0, $0, addr_found 
+   	# If not the right one, then load in next node and try again.
+    lw $a0, 4($sp)
+   	lw $a0, 8($a0)
+   	j addr_for_symbol
+
+    
        	
 addr_found:
 	# Grab the address of the current node. 
 	lw $v0, 4($a0) 
+    lw $ra, 0($sp)
+    addiu $sp $sp 8
 	jr $ra
        	
 addr_not_found: 
 	li $v0, -1
-        jr $ra			# End addr_for_symbol
+    lw $ra 0($sp)
+    addiu $sp $sp 8
+    jr $ra			# End addr_for_symbol
         
 #------------------------------------------------------------------------------
 # function add_to_list()

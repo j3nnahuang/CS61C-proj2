@@ -101,7 +101,8 @@ relocate_inst:
         
         move $s1, $v0		# store label name of instruction in $t1
         move $a0, $a2
-        move $a1, $s1        
+        move $a1, $s1   
+  
                 
         jal addr_for_symbol        
         beq $v0, $s0, error
