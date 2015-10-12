@@ -55,10 +55,11 @@ addr_for_symbol:
     sw $s1 8($sp)
     # sw $a0 4($sp)
    	# Begin addr_for_symbol
+    addu $s1 $a1 $0
    	
  looping_part:
  	addu $s0 $a0 $0 
- 	addu $s1 $a1 $0
+ 	
     #sw $a0 4($sp)
     #lw $a1 8($sp)
    	# First check if pointer is null - empty list. 
