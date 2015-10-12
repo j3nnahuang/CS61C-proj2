@@ -49,12 +49,18 @@
 #------------------------------------------------------------------------------
 addr_for_symbol:
     # YOUR CODE HERE
-    addiu $sp $sp -8
+    addiu $sp $sp -12 # 3 things
     sw $ra 0($sp)
-    sw $a0 4($sp)
+    sw $s0 4($sp)
+    sw $s1 8($sp)
+    # sw $a0 4($sp)
    	# Begin addr_for_symbol
    	
-    lw $a0 4($sp)
+ looping_part:
+ 	addu $s0 $a0 $0 
+ 	addu $s1 $a1 $0
+    #sw $a0 4($sp)
+    #lw $a1 8($sp)
    	# First check if pointer is null - empty list. 
    	beq $a0, $0, addr_not_found
    	# Else, start checking out symbols. 
@@ -63,11 +69,15 @@ addr_for_symbol:
     # Check if strings are equal
     addu $a0, $t0, $0 
     jal streq
+    	addu $a0 $s0 $0
+    	addu $a1 $s1 $0
+    addu $a0 $s0 $0    
    	beq $v0, $0, addr_found 
    	# If not the right one, then load in next node and try again.
-    lw $a0, 4($sp)
-   	lw $a0, 8($a0)
-   	j addr_for_symbol
+    # lw $a0, 4($sp)
+   	lw $a0, 8($s0)
+   	addu $a1 $s1 $0
+   	j looping_part
 
     
        	
@@ -75,13 +85,17 @@ addr_found:
 	# Grab the address of the current node. 
 	lw $v0, 4($a0) 
     lw $ra, 0($sp)
-    addiu $sp $sp 8
+    lw $s0, 4($sp)
+    lw $s1, 8($sp)
+    addiu $sp $sp 12
 	jr $ra
        	
 addr_not_found: 
 	li $v0, -1
     lw $ra 0($sp)
-    addiu $sp $sp 8
+    lw $s0, 4($sp)
+    lw $s1, 8($sp)
+    addiu $sp $sp 12
     jr $ra			# End addr_for_symbol
         
 #------------------------------------------------------------------------------

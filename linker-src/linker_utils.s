@@ -79,7 +79,7 @@ inst_needs_relocation:
 # Returns: the relocated instruction, or -1 if error
 #------------------------------------------------------------------------------
 relocate_inst:
-        addi $sp, $sp, -36
+        addiu $sp, $sp, -36
         sw $a0, 0($sp)
         sw $a1, 4($sp)
         sw $a2, 8($sp)
@@ -90,7 +90,7 @@ relocate_inst:
         sw $s2, 28($sp)
         sw $s3, 32($sp)
         
-        addi $s0, $0, -1	# num representing error
+        addiu $s0, $0, -1	# num representing error
         
         move $a0, $a3		# move relocation table to $a0 in prep for calling symbol_for_addr
         jal symbol_for_addr
@@ -107,11 +107,18 @@ relocate_inst:
         jal addr_for_symbol        
         beq $v0, $s0, error
         
-        move $s2, $v0		# store absolute address of instruction in $t2
+        move $s2, $v0		# store absolute address of instruction in $s2
         
         srl $s2, $s2, 2		# divide absolute address by 4 to get number of words
-        addiu $s3, $0, 0x0fffffff
-        and $s2, $s2, $s3
+        andi, $s2, $s2, 0x003fffff
+        
+        lw $a1, 4($sp)
+        srl $a1, $a1, 28
+        sll $a1, $a1, 28
+        andi, $a1, $a1, 0x03fffff
+        andi, $a1, $a1, 0xffc00000
+        
+        add $s2, $s2, $a1	# PC + 4 + new address
         
         lw $a0, 0($sp)
         
@@ -122,20 +129,30 @@ relocate_inst:
         
         
         error:        
+        lw $a0, 0($sp)
+        lw $a1, 4($sp)
+        lw $a2, 8($sp)
+        lw $a3, 12($sp)
         lw $ra, 16($sp)
+        lw $s0, 20($sp)
         lw $s1, 24($sp)
         lw $s2, 28($sp)
         lw $s3, 32($sp)
-        addi $sp, $sp, 36
+        addiu $sp, $sp, 36
         jr $ra
         
         finish_relocation:
         move $v0, $a0
+        lw $a0, 0($sp)
+        lw $a1, 4($sp)
+        lw $a2, 8($sp)
+        lw $a3, 12($sp)
         lw $ra, 16($sp)
+        lw $s0, 20($sp)
         lw $s1, 24($sp)
         lw $s2, 28($sp)
         lw $s3, 32($sp)
-        addi $sp, $sp, 36
+        addiu $sp, $sp, 36
         jr $ra
 
 ###############################################################################
