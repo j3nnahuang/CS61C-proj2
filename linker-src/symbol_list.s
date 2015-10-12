@@ -71,8 +71,8 @@ addr_for_symbol:
     addu $a0, $t0, $0 
     jal streq
     	addu $a0 $s0 $0
-    	addu $a1 $s1 $0
-    addu $a0 $s0 $0    
+    	#addu $a1 $s1 $0
+    #addu $a0 $s0 $0    
    	beq $v0, $0, addr_found 
    	# If not the right one, then load in next node and try again.
     # lw $a0, 4($sp)
