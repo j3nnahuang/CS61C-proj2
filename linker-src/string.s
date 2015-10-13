@@ -94,8 +94,14 @@ strncpy:
 #------------------------------------------------------------------------------
 copy_of_str:
 
-	addi $sp, $sp, -4	# move stack pointer to store saved register in stack
+	addi $sp, $sp, -24	# move stack pointer to store saved register in stack
 	sw $ra, 0($sp)
+	sw $a0, 4($sp)
+	sw $a1, 8($sp)
+	sw $a2, 12($sp)
+	sw $s1, 16($sp)
+	sw $s2, 20($sp)
+	
 
 	move $s1, $a0		# store source string in $s1		
 	jal strlen
@@ -112,7 +118,12 @@ copy_of_str:
 	jal strncpy			# copies string into allocated memory and returns pointer to it
 
 	lw $ra, 0($sp)		# load back return address reg and move stack pointer back
-	addiu $sp, $sp, 4
+	lw $a0, 4($sp)
+	lw $a1, 8($sp)
+	lw $a2, 12($sp)
+	lw $s1, 16($sp)
+	lw $s2, 20($sp)
+	addiu $sp, $sp, 24
 	jr $ra
 
 ###############################################################################

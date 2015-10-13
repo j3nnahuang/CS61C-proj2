@@ -133,6 +133,7 @@ add_to_list:
         sw $a1 8($sp)
         sw $a2 12($sp)
         sw $s0 16($sp)
+      
         
         # Create new node. 
         jal new_node
