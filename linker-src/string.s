@@ -29,14 +29,14 @@ tab:	.asciiz "\t"
 strlen:
 	add $v0, $0, $0		# initialize length to 0
 
-	count:
+count:
 	lb $t0, 0($a0)		# load next char
 	beqz $t0, exit		# exit if null character
 	addiu $v0, $v0, 1	# increment length by 1
 	addiu $a0, $a0, 1	# point to next char in string
-	j count 			# loop again
+	j count 		# loop again
 
-	exit:
+exit:
 	jr $ra
 
 #------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ strncpy:
 	add $t0, $0, $0		# initialize counter to 0
 	move $v0, $a0		# store pointer to dest array in $v0
 
-	copy:
+copy:
 	lb $t1, 0($a1)		# load next char from src string
 	beq $t0, $a2, finish	# exit if reached num of chars to copy
 	beqz $t1, pad		# pad with 0s if end of src reached before num
@@ -63,9 +63,9 @@ strncpy:
 	addiu $a0, $a0, 1	# point to next char in dest
 	addiu $a1, $a1, 1	# point to next char in src
 	addiu $t0, $t0, 1	# increment counter by 1
-	j copy 				# loop again
+	j copy 			# loop again
 
-	pad:
+pad:
 	lb $t2, 0($a0)		# load next address in dest array
 	move $t2, $0		# place null value in dest reg
 	sb $t2, 0($a0)		# store null value in dest array
@@ -73,7 +73,7 @@ strncpy:
 	addiu $t0, $t0, 1	# increment counter by 1
 	beq $t0, $a2, finish	# exit if reached num of chars to copy
 
-	finish:
+finish:
 	addiu $a0, $a0, 1
 	lb $t2, 0($a0)		# load next address in dest array
 	move $t2, $0		# store 0

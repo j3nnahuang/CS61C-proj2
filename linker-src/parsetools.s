@@ -48,13 +48,13 @@ hex_to_str:
 load_and_loop:	
 	beq $t5, $t6, complete
 	move $t0, $a0		# load byte into $t0
-	sllv $t1, $t0, $t5	# shift 4-bit section to upper 4 bits
-	srl $t1, $t1, 28	# shift 4-bit section to lower 4 bits
+	sllv $t1, $t0, $t5	# shift 4-bit section to most significant 4 bits
+	srl $t1, $t1, 28	# shift 4-bit section to least significant 4 bits
 	and $t1, $t1, $t7	# and with mask to get rid of leading zeros
 
 convert:
-	ble $t1, $t3, num
-	ble $t1, $t4, letter
+	ble $t1, $t3, num	# branch to num if 0-9
+	ble $t1, $t4, letter	# branch to letter if 10-15 (A-F)
 
 num:
 	addiu $t1, $t1, 48	# convert to ASCII decimal where '0' = 48	
