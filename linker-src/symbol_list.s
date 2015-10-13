@@ -61,6 +61,7 @@ addr_for_symbol:
  	
    	# First check if pointer is null - empty list. 
    	beq $a0, $0, addr_not_found
+    
    	# Else, start checking out symbols.
    	lw $t0, 0($a0)		# $t0 holds curr name. 
    	
@@ -68,7 +69,7 @@ addr_for_symbol:
     	addu $a0, $t0, $0 
     	jal streq
     	addu $a0 $s0 $0    
-   	beq $v0, $0, addr_found 
+   	    beq $v0, $0, addr_found 
    	
    	# If not the right one, then load in next node and try again.
    	lw $a0, 8($s0)

@@ -78,15 +78,14 @@ write_machine_code_find_text:
 	
 	# 1. Initialize the byte offset to zero. We will need this for any instructions
 	# that require relocation:
-	# YOUR_INSTRUCTIONS_HERE
-	# Okay I'm not super sure what to do here, but... store the byte offset in $s5?
-	addu $s5 $0 $0
+	
+	addu $s5 $0 $0 # Store the byte offset in $s5
 
 write_machine_code_next_inst:
 	# 2. Call readline() while passing in the correct arguments:
-	# YOUR_INSTRUCTIONS_HERE
-	# readline takes in File handle, $a0
-	# File handle originally stored in $a1 - currently $s1
+	
+	# readline takes in file handle, $a0
+	# File handle currently $s1
 	addu $a0 $s1 $0
 	jal readline
 
@@ -100,7 +99,6 @@ write_machine_code_next_inst:
 	
 	# 3. Looks like there is another instruction. Call parse_int() with base=16
 	# to convert the instruction into a number, and store it into a register:
-	# YOUR_INSTRUCTIONS_HERE
 	addu $a0 $v1 $0 
 	addiu $a1 $0 16
 	jal parse_int
@@ -109,9 +107,7 @@ write_machine_code_next_inst:
 	
 	# 4. Check if the instruction needs relocation. If it does not, branch to
 	# the label write_machine_code_to_file:
-	# YOUR_INSTRUCTIONS_HERE
 	
-	# inst_needs_relocation returns 1 if yes
 	addu $a0 $s6 $0
 	jal inst_needs_relocation
 	beq $v0 $0 write_machine_code_to_file # Don't need relocation
@@ -119,12 +115,10 @@ write_machine_code_next_inst:
 	
 	# 5. Here we handle relocation. Call relocate_inst() with the appropriate
 	# arguments, and store the relocated instruction in the appropriate register:
-	# YOUR_INSTRUCTIONS_HERE
-	
-	# Store relocated instruction in appropriate register...I'm going to assume
-	# just store it back to the same reg. 
+	 
+	# Store relocated inst back to same reg. 
 	addu $a0 $s6 $0
-	addu $a1 $s5 $0 # Byte offset I put in $s5
+	addu $a1 $s5 $0 # Byte offset put in $s5
 	addu $a2 $s2 $0 # Symbol table
 	addu $a3 $s3 $0 # Relocation table
 	jal relocate_inst 
@@ -133,14 +127,11 @@ write_machine_code_next_inst:
 
 write_machine_code_to_file:
 	# 6. Write the instruction into a string buffer via hex_to_str():
-	# YOUR_INSTRUCTIONS_HERE 
 	addu $a0 $s6 $0 # Int to write
 	la $a1, hex_buffer
 	jal hex_to_str
 	
 	# 7. Increment the byte offset by the appropriate amount:
-	# YOUR_INSTRUCTIONS_HERE
-	# Increment byte offset by appropriate amount - I assume 4...per instruction...
 	addiu $s5 $s5 4
 
 	# Here, we use the write to file syscall. WE specify the output file as $a0.
