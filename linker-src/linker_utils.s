@@ -109,16 +109,8 @@ relocate_inst:
         
         move $s2, $v0		# store absolute address of instruction in $s2
         
-        sll $s2, $s2, 2		# divide absolute address by 4 to get number of words
+        srl $s2, $s2, 2		# divide absolute address by 4 to get number of words
         andi, $s2, $s2, 0x003fffff
-        
-        lw $a1, 4($sp)
-        srl $a1, $a1, 28
-        sll $a1, $a1, 28
-        andi, $a1, $a1, 0x03fffff
-        andi, $a1, $a1, 0xffc00000
-        
-        add $s2, $s2, $a1	# PC + 4 + new address
         
         lw $a0, 0($sp)
         
@@ -128,7 +120,7 @@ relocate_inst:
         j finish_relocation
         
         
-        error:        
+        error:     
         lw $a0, 0($sp)
         lw $a1, 4($sp)
         lw $a2, 8($sp)
