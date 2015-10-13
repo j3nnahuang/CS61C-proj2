@@ -110,7 +110,7 @@ relocate_inst:
         move $s2, $v0		# store absolute address of instruction in $s2
         
         srl $s2, $s2, 2		# divide absolute address by 4 to get number of words
-        andi, $s2, $s2, 0x003fffff
+        andi, $s2, $s2, 0x03ffffff
         
         lw $a0, 0($sp)
         
@@ -234,6 +234,7 @@ atsl_next:
         move $a0, $s1           # $a0 = symbol list
         move $a1, $v1           # $a1 = symbol name (string)
         addu $a2, $s2, $v0      # $a2 = symbol offset (bytes)
+        
         jal add_to_list
         move $s1, $v0
         beq $s3, $0, atsl_done
